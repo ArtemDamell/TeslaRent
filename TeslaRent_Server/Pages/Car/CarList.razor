@@ -1,0 +1,67 @@
+﻿@*27.1 Создаём маршрут к компоненту*@
+@page "/car-list"
+@inject ITeslaCarRepository _db
+
+@*27.2 Создаём разметку компонента*@
+<div class="row mt-4">
+	<div class="col-8">
+		<h4 class="card-title text-info">All car's</h4>
+	</div>
+	<div class="col-3 offset-1">
+		<NavLink href="car-list/create" class="btn btn-info form-control">Add New Car</NavLink>
+	</div>
+</div>
+
+@*31.1 Создаём таблицу вывода машин*@
+<div class="row mt-3">
+	<div class="col">
+		<table class="table table-striped table-hover">
+			<thead class="bg-info">
+				<tr>
+					<th>Name</th>
+					<th>Occupancy</th>
+					<th>Rate</th>
+					<th>Number of seats</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				@if (Cars is not null && Cars.Any())
+				{
+					@foreach (var item in Cars)
+				   {
+					   <tr>
+						   <td>@item.Name</td>
+						   <td>@item.Occupancy</td>
+						   <td>@item.RegularRate</td>
+						   <td>@item.NumberOfSeats</td>
+						   <td>
+							   @*47. Реализовываем кнопку редактирования машины*@
+							   <NavLink class="btn btn-primary" href="@($"car-list/edit/{item.Id}")">Edit</NavLink>
+						   </td>
+					   </tr>
+				   }
+				}
+				else
+				{
+					<tr>
+						<td colspan="5">
+							<label>No cars found ...</label>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+@code {
+	// 31.2 Создаём переменную для хранения всех машин
+	IEnumerable<TeslaCarDTO> Cars = new List<TeslaCarDTO>();
+
+	// 31.3 Инициализируем массив значениями в методе жизненного цикла
+	protected override async Task OnInitializedAsync()
+	{
+		Cars = await _db.GetAllCars();
+	}
+}

@@ -1,0 +1,153 @@
+﻿@*29.1 Компонент для добавления новых машин*@
+@page "/car-list/create"
+
+@*46.2 Добавляем маршрут для редактирования*@
+@page "/car-list/edit/{Id:int}"
+
+@inject ITeslaCarRepository _db
+@inject NavigationManager _navManager
+
+@*50 Внедряем функционал JS*@
+@inject IJSRuntime _js
+
+<div class="row mt-2 mb-5">
+	<h3 class="card-title text-info mb-3 ml-3">@title Car</h3>
+	<div class="col-12">
+		<div class="card">
+			<div class="card-body" style="background-color: #004bff0f">
+				@*29.2 Добавляем форму Blazor, которая требует модели*@
+				<EditForm Model="carModel" OnValidSubmit="CreateUpdateCarHandler">
+
+					<DataAnnotationsValidator />
+					<ValidationSummary />
+
+					<div class="form-group mb-3">
+						<label>Name</label>
+						<InputText @bind-Value="carModel.Name" class="form-control" placeholder="Enter car name..." />
+						<ValidationMessage For="()=> carModel.Name" />
+					</div>
+					<div class="form-group mb-3">
+						<label>Occupancy</label>
+						<InputNumber @bind-Value="carModel.Occupancy" class="form-control" />
+						<ValidationMessage For="()=> carModel.Occupancy" />
+					</div>
+					<div class="form-group mb-3">
+						<label>Regular Rate</label>
+						<InputNumber @bind-Value="carModel.RegularRate" class="form-control" />
+						<ValidationMessage For="()=> carModel.RegularRate" />
+					</div>
+					<div class="form-group mb-3">
+						<label>Number Of Seats</label>
+						<InputText @bind-Value="carModel.NumberOfSeats" class="form-control" placeholder="Enter number of seats..." />
+						<ValidationMessage For="()=> carModel.NumberOfSeats" />
+					</div>
+					<div class="form-group mb-3">
+						<label>Details</label>
+						<InputTextArea @bind-Value="carModel.Details" class="form-control" placeholder="Enter car description..." />
+						<ValidationMessage For="()=> carModel.Details" />
+					</div>
+					<button class="btn btn-outline-primary" type="submit">@title Car</button>
+					<NavLink href="car-list" class="btn btn-outline-success">Back To Car List</NavLink>
+				</EditForm>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+@code {
+	// 46.3 Добавляем свойство параметра для маршрута
+	[Parameter] public int? Id { get; set; }
+
+	// 29.3 Добавляем модель данных DTO, добавив ссылку на проект Models
+	// Модели будут использоваться во всём проекте, поэтому добавляем using глобально
+	TeslaCarDTO carModel = new();
+	string title = "Create";
+
+	// 46.1 Создаём метод инициализации значений компонента
+	// И последующей проверки, создаём мы или редактируем машину
+	protected override async Task OnInitializedAsync()
+	{
+		// Далее, перед реализацией, добавляем ещё один маршрут для редактирования
+
+		// 46.4 Реализовываем проверку, создаём или редактируем
+		if (Id is not null)
+		{
+			// Updating
+			title = "Update";
+			carModel = await _db.GetCar(Id.Value);
+		}
+		else
+		{
+			// Creating
+			carModel = new();
+		}
+		// После этого, идём в компонент листа и реализовываем кнопку редактирования
+	}
+
+	// 48.1 Переименовываем метод в универсальный CreateUpdateCarHandler
+	//async Task CreateNewCar()
+	async Task CreateUpdateCarHandler()
+	{
+		// 48.2
+		try
+		{
+			var carDetailsByName = await _db.IsCarUnique(carModel.Name, carModel.Id);
+			if (carDetailsByName is not null)
+			{
+				await _js.ToastrError("Car name already exists.");
+				return;
+			}
+
+			if (!carModel.Id.Equals(0) && title.Equals("Update"))
+			{
+				// Update
+				var updateCarResult = await _db.UpdateCar(carModel.Id, carModel);
+
+				if (updateCarResult is not null)
+				{
+					await _js.ToastrSuccess($"{updateCarResult.Name} updating successful!");
+					_navManager.NavigateTo("car-list");
+				}
+				
+				else
+					await _js.ToastrError("Shit happens.. Not updated!");
+			}
+			else
+			{
+				// Create
+				var createdCar = await _db.CreateCar(carModel);
+
+				if (createdCar is not null)
+				{
+					await _js.ToastrSuccess($"{createdCar.Name} creating successful!");
+					_navManager.NavigateTo("car-list");
+				}
+				else
+					await _js.ToastrError("Shit is happen.. Not created!");
+
+			}
+
+		}
+		catch (Exception ex)
+		{
+			// Do momething with exception
+		}
+
+		// На этом этапе переходим к внедрению зависимости нашего сервиса, шаг 30
+		// 48.3 Переносим в блок Create
+		//var carDetailsByName = await _db.IsCarUnique(carModel.Name);
+
+		//if (carDetailsByName is not null)
+		//{
+		//	// TODO: Show error
+		//	return;
+		//}
+
+		//var createdCar = await _db.CreateCar(carModel);
+
+		//// TODO: Check creation status
+
+		//_navManager.NavigateTo("car-list");
+	}
+}

@@ -1,0 +1,76 @@
+﻿@*34.1 Делаем компонент самостоятельным*@
+@page "/learn/blazorjs"
+@*Следующим шагом добавить пункт меню для нового компонента*@
+
+@inject IJSRuntime _js
+
+<div class="row">
+	<div class="col">
+		<h1 class="text-info">Confirmation calling from JS</h1>
+	</div>
+</div>
+
+<div class="row mt-3">
+	<div class="col text-center">
+		@if (confirmResult is not null && confirmResult.Value is true)
+		{
+			<div class="alert alert-success">Confirmation has been made!</div>
+		}
+		else if (confirmResult is not null && confirmResult.Value is false)
+		{
+			<div class="alert alert-danger">Confirmation cancelled!</div>
+		}
+	</div>
+</div>
+
+<div class="row">
+	<div class="col d-flex justify-content-center">
+		@*37.1 Комментируем старую кноку и добавляем новые*@
+		<button class="btn btn-info m-1" @onclick="TestConfirmBox">Test Confirm Button</button>
+
+		<button class="btn btn-danger m-1" @onclick="TestFailure">Test Toast Failure</button>
+		<button class="btn btn-success m-1" @onclick="TestSuccess">Test Toastr Success</button>
+
+	</div>
+</div>
+
+@*45.1 Добавляем кнопки для вызова Sweet Alerts 2*@
+<div class="row">
+	<div class="col d-flex justify-content-center">
+		<button class="btn btn-success m-1" @onclick="TestSuccessSwal">Test SWAL2 Success</button>
+		<button class="btn btn-danger m-1" @onclick="TestFailureSwal">Test SWAL2 Failure</button>
+	</div>
+</div>
+
+@code {
+	string confirmMessage = "Are you shure you want to click?";
+	bool? confirmResult;
+
+	async Task TestConfirmBox()
+	{
+		confirmResult = await _js.InvokeAsync<bool>("confirm", confirmMessage);
+	}
+
+	async Task TestSuccess()
+	{
+		// 41.1 Меняем вызов на метод расширения, оригинальный метод закомментирован
+		//await _js.InvokeVoidAsync("ShowToastr", "success", "Success Message");
+		await _js.ToastrSuccess("Success Message");
+	}
+	async Task TestFailure()
+	{
+		// 41.2 Меняем вызов на метод расширения, оригинальный метод закомментирован
+		//await _js.InvokeVoidAsync("ShowToastr", "error", "Error Message");
+		await _js.ToastrError("Error Message");
+	}
+
+	// 45.2 Добавляем методы обработки SWAL
+	async Task TestSuccessSwal()
+	{
+		await _js.InvokeVoidAsync("ShowSweetAlerts", "success", "Task completed successfully!");
+	}
+	async Task TestFailureSwal()
+	{
+		await _js.InvokeVoidAsync("ShowSweetAlerts", "error", "Task failed!");
+	}
+}
