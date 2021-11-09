@@ -25,5 +25,9 @@ namespace DataAccess.Data
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
         public string? UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
+
+        // 53. Добавляем коллекцию для хранения картинок
+        // Так, как свойство у нас виртуальное, миграции совершать не нужно!
+        public virtual ICollection<TeslaCarImage>? TeslaCarImages { get; set; }
     }
 }

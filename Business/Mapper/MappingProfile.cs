@@ -28,6 +28,11 @@ namespace Business.Mapper
 
             // 25. Добавляем маршрут обратной конвертации
             CreateMap<TeslaCar, TeslaCarDTO>();
+
+            // 55. Добавляем новый маршрут для изображений
+            // ReverseMap() позволяет в автоматическом режиме делать обратную конвертацию
+            // Этот метод работает только при полном совпадении названий свойств модели
+            CreateMap<TeslaCarImage, TeslaCarImageDTO>().ReverseMap();
         }
     }
 }

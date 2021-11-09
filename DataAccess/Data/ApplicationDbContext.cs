@@ -11,5 +11,8 @@ namespace DataAccess.Data
 
         // 16. Добавляем новую модель в контекст данных
         public DbSet<TeslaCar> TeslaCars {  get; set; }
+
+        // 52. Добавляем таблицу картинок для машин
+        public DbSet<TeslaCarImage> TeslaCarImages { get; set; }
     }
 }
