@@ -16,5 +16,9 @@ namespace Models
         public double RegularRate { get; set; }
         public string Details { get; set; }
         public string NumberOfSeats { get; set; }
+
+        // 61. Копируем свойство для картинки
+        public virtual ICollection<TeslaCarImageDTO>? TeslaCarImages { get; set; }
+        public List<string> ImageUrls { get; set; }
     }
 }

@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using Business.Repository.IRepository;
 using Business.Repository;
+using TeslaRent_Server.Service.IService;
+using TeslaRent_Server.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,10 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // 30. Внедряем и конфигурируем сервис, добавил ссылку на проект
 builder.Services.AddScoped<ITeslaCarRepository, TeslaCarRepository>();
+
+// 62.3. Конфигурируем зависимость загрузчика и класс загрузки
+builder.Services.AddScoped<IFileUpload, FileUpload>();
+builder.Services.AddScoped<ITeslaCarImageRepository, TeslaCarImageRepository>();
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();

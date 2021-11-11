@@ -10,6 +10,11 @@
 @*50 Внедряем функционал JS*@
 @inject IJSRuntime _js
 
+@*62.2*@
+@using TeslaRent_Server.Service.IService
+@inject IFileUpload _fileUpload
+@*62.3 Идём в класс Program и конфигурируем зависимость загрузчика*@
+
 <div class="row mt-2 mb-5">
 	<h3 class="card-title text-info mb-3 ml-3">@title Car</h3>
 	<div class="col-12">
@@ -46,6 +51,13 @@
 						<InputTextArea @bind-Value="carModel.Details" class="form-control" placeholder="Enter car description..." />
 						<ValidationMessage For="()=> carModel.Details" />
 					</div>
+
+					@*60.1 Реализовать вывод компонента загрузки файлов*@
+					<div class="form-group mb-3">
+						<InputFile OnChange="ImageUploadHandler" multiple></InputFile>
+					</div>
+					@*/////////////////////////////////////////////////*@
+
 					<button class="btn btn-outline-primary" type="submit">@title Car</button>
 					<NavLink href="car-list" class="btn btn-outline-success">Back To Car List</NavLink>
 				</EditForm>
@@ -109,7 +121,7 @@
 					await _js.ToastrSuccess($"{updateCarResult.Name} updating successful!");
 					_navManager.NavigateTo("car-list");
 				}
-				
+
 				else
 					await _js.ToastrError("Shit happens.. Not updated!");
 			}
@@ -131,7 +143,7 @@
 		}
 		catch (Exception ex)
 		{
-			// Do momething with exception
+			// Do something with exception
 		}
 
 		// На этом этапе переходим к внедрению зависимости нашего сервиса, шаг 30
@@ -149,5 +161,52 @@
 		//// TODO: Check creation status
 
 		//_navManager.NavigateTo("car-list");
+	}
+
+	// 62.1 Реализовываем метод обработки загрузки
+	async Task ImageUploadHandler(InputFileChangeEventArgs e)
+	{
+		try
+		{
+			var images = new List<string>();
+			if (e.GetMultipleFiles().Count > 0)
+			{
+				foreach (var item in e.GetMultipleFiles())
+				{
+					System.IO.FileInfo fileInfo = new System.IO.FileInfo(item.Name);
+
+					if (fileInfo.Extension.ToLower() == ".jpg" ||
+						fileInfo.Extension.ToLower() == ".png" ||
+						fileInfo.Extension.ToLower() == ".jpeg")
+					{
+						// 62.2 На этом месте подключаем нужный Using и внедряем библиотеку
+						var uploadedImagePath = await _fileUpload.UploadFileAsync(item);
+						images.Add(uploadedImagePath);
+					}
+					else
+					{
+						await _js.ToastrError("Please select .jpg/.jpeg/.png files only");
+						return;
+					}
+				}
+
+				if (images.Any())
+				{
+					if (carModel.ImageUrls is not null && carModel.ImageUrls.Any())
+						carModel.ImageUrls.AddRange(images);
+					else
+					{
+						carModel.ImageUrls = new();
+						carModel.ImageUrls.AddRange(images);
+					}
+				}
+				else
+					await _js.ToastrError("Image uploading failed");
+			}
+		}
+		catch (Exception ex)
+		{
+			await _js.ToastrError(ex.Message);
+		}
 	}
 }
