@@ -54,7 +54,7 @@ namespace TeslaRent_Server.Service
                     memoryStream.WriteTo(fs);
                 }
 
-                var fullPath = $"RoomImages/{fileName}";
+                var fullPath = $"CarImages/{fileName}";
                 return fullPath;
             }
             catch (Exception ex)
