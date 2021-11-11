@@ -30,6 +30,7 @@ namespace Business.Repository
             {
                 var image = _mapper.Map<TeslaCarImageDTO, TeslaCarImage>(imageDTO);
                 await _db.TeslaCarImages.AddAsync(image);
+                await _db.SaveChangesAsync();
                 return true;
             }
             catch (Exception)
