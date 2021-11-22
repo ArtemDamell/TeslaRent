@@ -27,15 +27,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				@if (Cars is null)
-				{
-					<tr>
-						<td colspan="5" class="text-center">
-							<label>Loadin cars from db ... <i class="fas fa-truck-loading" style="font-size: 50px;"></i></label>
-						</td>
-					</tr>
-				}
-				else if (Cars.Any())
+				@if (Cars is not null && Cars.Any())
 				{
 					@foreach (var item in Cars)
 				   {
@@ -72,7 +64,7 @@
 
 @code {
 	// 31.2 Создаём переменную для хранения всех машин
-	IEnumerable<TeslaCarDTO>? Cars;
+	IEnumerable<TeslaCarDTO> Cars = new List<TeslaCarDTO>();
 
 	// 76.2 / 76.2 Добавляем переменную для отображениея окна
 	bool ShowCloseModal;
@@ -84,7 +76,6 @@
 	// 31.3 Инициализируем массив значениями в методе жизненного цикла
 	protected override async Task OnInitializedAsync()
 	{
-		await Task.Delay(5000);
 		Cars = await _db.GetAllCars();
 	}
 
@@ -95,7 +86,7 @@
 		{
 			// 77.3 --> Идём и модифицируем метод удаления в TeslaCarRepository метод DeleteCar(int carId)
 			await _db.DeleteCar(DeletingCarId.Value);
-			await _js.ToastrSuccess($"Car with ID: {DeletingCarId.Value} deleting successful!");
+			await _js.ToastrSuccess($"{DeletingCarId.Value} deleting successful!");
 
 			Cars = await _db.GetAllCars();
 		}
