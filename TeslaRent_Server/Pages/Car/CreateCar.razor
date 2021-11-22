@@ -212,7 +212,7 @@
                 else
                     await _js.ToastrError("Shit is happen.. Not created!");
 
-            }
+			}
 
         }
         catch (Exception ex)
@@ -220,117 +220,67 @@
             // Do something with exception
         }
 
-        // На этом этапе переходим к внедрению зависимости нашего сервиса, шаг 30
-        // 48.3 Переносим в блок Create
-        //var carDetailsByName = await _db.IsCarUnique(carModel.Name);
+		// На этом этапе переходим к внедрению зависимости нашего сервиса, шаг 30
+		// 48.3 Переносим в блок Create
+		//var carDetailsByName = await _db.IsCarUnique(carModel.Name);
 
-        //if (carDetailsByName is not null)
-        //{
-        //	// TODO: Show error
-        //	return;
-        //}
+		//if (carDetailsByName is not null)
+		//{
+		//	// TODO: Show error
+		//	return;
+		//}
 
-        //var createdCar = await _db.CreateCar(carModel);
+		//var createdCar = await _db.CreateCar(carModel);
 
-        //// TODO: Check creation status
+		//// TODO: Check creation status
 
-        //_navManager.NavigateTo("car-list");
-    }
+		//_navManager.NavigateTo("car-list");
+	}
 
-    // 62.1 Реализовываем метод обработки загрузки
-    async Task ImageUploadHandler(InputFileChangeEventArgs e)
-    {
-        // 73.1 / 73.2 Меняем значение блока отображения загрузки
-        uploadsStart = true;
-        try
-        {
-            var images = new List<string>();
-            if (e.GetMultipleFiles().Count > 0)
-            {
-                foreach (var item in e.GetMultipleFiles(10))
-                {
-                    System.IO.FileInfo fileInfo = new System.IO.FileInfo(item.Name);
+	// 62.1 Реализовываем метод обработки загрузки
+	async Task ImageUploadHandler(InputFileChangeEventArgs e)
+	{
+		try
+		{
+			var images = new List<string>();
+			if (e.GetMultipleFiles().Count > 0)
+			{
+				foreach (var item in e.GetMultipleFiles())
+				{
+					System.IO.FileInfo fileInfo = new System.IO.FileInfo(item.Name);
 
-                    if (fileInfo.Extension.ToLower() == ".jpg" ||
-                        fileInfo.Extension.ToLower() == ".png" ||
-                        fileInfo.Extension.ToLower() == ".jpeg")
-                    {
-                        // 62.2 На этом месте подключаем нужный Using и внедряем библиотеку
-                        var uploadedImagePath = await _fileUpload.UploadFileAsync(item);
-                        images.Add(uploadedImagePath);
-                    }
-                    else
-                    {
-                        await _js.ToastrError("Please select .jpg/.jpeg/.png files only");
-                        return;
-                    }
-                }
+					if (fileInfo.Extension.ToLower() == ".jpg" ||
+						fileInfo.Extension.ToLower() == ".png" ||
+						fileInfo.Extension.ToLower() == ".jpeg")
+					{
+						// 62.2 На этом месте подключаем нужный Using и внедряем библиотеку
+						var uploadedImagePath = await _fileUpload.UploadFileAsync(item);
+						images.Add(uploadedImagePath);
+					}
+					else
+					{
+						await _js.ToastrError("Please select .jpg/.jpeg/.png files only");
+						return;
+					}
+				}
 
-                if (images.Any())
-                {
-                    if (carModel.ImageUrls is not null && carModel.ImageUrls.Any())
-                        carModel.ImageUrls.AddRange(images);
-                    else
-                    {
-                        carModel.ImageUrls = new();
-                        carModel.ImageUrls.AddRange(images);
-                    }
-                }
-                else
-                    await _js.ToastrError("Image uploading failed");
-            }
-            // 73.2 / 73.2 Меняем значение блока отображения загрузки
-            uploadsStart = false;
-        }
-        catch (Exception ex)
-        {
-            await _js.ToastrError(ex.Message);
-        }
-    }
-
-    // 65.2 Реализовываем метод
-    async Task AddCarImage(TeslaCarDTO carDetails)
-    {
-        // Перед реализацией метода нам понадобится внедрить зависимость ITeslaCarRepository и добавить переменную для хранения
-        foreach (var item in carModel.ImageUrls)
-        {
-            if (carModel.TeslaCarImages is null || carModel.TeslaCarImages.Where(x => x.CarImageUrl == item).Count() == 0)
-            {
-                carImage = new()
-                    {
-                        CarId = carDetails.Id,
-                        CarImageUrl = item
-                    };
-                await _imageRepository.CreateTeslaCarImage(carImage);
-            }
-        }
-    }
-
-    // 69.2 Реализуем событие нажатия по кнопке Delete
-    async Task DeleteImage(string imageUrl)
-    {
-        try
-        {
-            var imageIndex = carModel.ImageUrls.FindIndex(x => x == imageUrl);
-            var imageName = imageUrl.Replace($"CarImages/", "");
-
-            // Create car
-            if (carModel.Id.Equals(0) && title == "Create")
-            {
-                var result = _fileUpload.DeleteFile(imageName);
-            }
-            else
-            {
-                // Update car
-                DeletedImageNames ??= new();
-                DeletedImageNames.Add(imageUrl);
-            }
-
-            carModel.ImageUrls.RemoveAt(imageIndex);
-        }
-        catch (Exception ex)
-        {
-            await _js.ToastrError(ex.Message);
-        }
-    }
+				if (images.Any())
+				{
+					if (carModel.ImageUrls is not null && carModel.ImageUrls.Any())
+						carModel.ImageUrls.AddRange(images);
+					else
+					{
+						carModel.ImageUrls = new();
+						carModel.ImageUrls.AddRange(images);
+					}
+				}
+				else
+					await _js.ToastrError("Image uploading failed");
+			}
+		}
+		catch (Exception ex)
+		{
+			await _js.ToastrError(ex.Message);
+		}
+	}
 }
