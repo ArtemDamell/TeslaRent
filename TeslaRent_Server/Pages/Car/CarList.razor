@@ -1,7 +1,6 @@
 ﻿@*27.1 Создаём маршрут к компоненту*@
 @page "/car-list"
 @inject ITeslaCarRepository _db
-@inject IJSRuntime _js
 
 @*27.2 Создаём разметку компонента*@
 <div class="row mt-4">
@@ -39,8 +38,6 @@
 						   <td>
 							   @*47. Реализовываем кнопку редактирования машины*@
 							   <NavLink class="btn btn-primary" href="@($"car-list/edit/{item.Id}")">Edit</NavLink>
-							   @*77.1 / 77.3  Добавляем кнпку удаления машины из листа*@
-							   <button class="btn btn-danger" @onclick="(() =>DeletingHandler(item))">Delete</button>
 						   </td>
 					   </tr>
 				   }
@@ -58,49 +55,13 @@
 	</div>
 </div>
 
-@*76.1 Добавляем компонент на страницу*@
-<DeleteConfirmation OnShowCloseModal="ShowCloseModal" OnCloseHandler="CloseModalHandler" OnCarForRemoving="objForRemoving" OnConfirmed="DeletingConfirmation" />
-
-
 @code {
 	// 31.2 Создаём переменную для хранения всех машин
 	IEnumerable<TeslaCarDTO> Cars = new List<TeslaCarDTO>();
-
-	// 76.2 / 76.2 Добавляем переменную для отображениея окна
-	bool ShowCloseModal;
-
-	// 77.3 / 77.3 Добавляем переменную для хранения ID удаляемой машины
-	int? DeletingCarId;
-	TeslaCarDTO? objForRemoving;
 
 	// 31.3 Инициализируем массив значениями в методе жизненного цикла
 	protected override async Task OnInitializedAsync()
 	{
 		Cars = await _db.GetAllCars();
-	}
-
-	// 77.2/ 77.3 Добавляем метод удаления
-	async Task DeletingConfirmation(bool isConfirmed)
-	{
-		if (isConfirmed && DeletingCarId is not null)
-		{
-			// 77.3 --> Идём и модифицируем метод удаления в TeslaCarRepository метод DeleteCar(int carId)
-			await _db.DeleteCar(DeletingCarId.Value);
-			await _js.ToastrSuccess($"{DeletingCarId.Value} deleting successful!");
-
-			Cars = await _db.GetAllCars();
-		}
-		ShowCloseModal = false;
-	}
-	void DeletingHandler(TeslaCarDTO car)
-	{
-		DeletingCarId = car.Id;
-		objForRemoving = car;
-		ShowCloseModal = true;
-	}
-
-	void CloseModalHandler()
-	{
-		ShowCloseModal = !ShowCloseModal;
 	}
 }
