@@ -283,4 +283,50 @@
 			await _js.ToastrError(ex.Message);
 		}
 	}
+
+    // 65.2 Реализовываем метод
+    async Task AddCarImage(TeslaCarDTO carDetails)
+    {
+        // Перед реализацией метода нам понадобится внедрить зависимость ITeslaCarRepository и добавить переменную для хранения
+        foreach (var item in carModel.ImageUrls)
+        {
+            if (carModel.TeslaCarImages is null || carModel.TeslaCarImages.Where(x => x.CarImageUrl == item).Count() == 0)
+            {
+                carImage = new()
+                    {
+                        CarId = carDetails.Id,
+                        CarImageUrl = item
+                    };
+                await _imageRepository.CreateTeslaCarImage(carImage);
+            }
+        }
+    }
+
+    // 69.2 Реализуем событие нажатия по кнопке Delete
+    async Task DeleteImage(string imageUrl)
+    {
+        try
+        {
+            var imageIndex = carModel.ImageUrls.FindIndex(x => x == imageUrl);
+            var imageName = imageUrl.Replace($"CarImages/", "");
+
+            // Create car
+            if (carModel.Id.Equals(0) && title == "Create")
+            {
+                var result = _fileUpload.DeleteFile(imageName);
+            }
+            else
+            {
+                // Update car
+                DeletedImageNames ??= new();
+                DeletedImageNames.Add(imageUrl);
+            }
+
+            carModel.ImageUrls.RemoveAt(imageIndex);
+        }
+        catch (Exception ex)
+        {
+            await _js.ToastrError(ex.Message);
+        }
+    }
 }

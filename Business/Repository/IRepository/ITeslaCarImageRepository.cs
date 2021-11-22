@@ -18,5 +18,7 @@ namespace Business.Repository.IRepository
         public Task<bool> DeleteTeslaCarImageByCarId(int carId);
         // 56.4
         public Task<IEnumerable<TeslaCarImageDTO>?> GetTeslaCarImages(int carId);
+        // 70.1
+        Task<bool> DeleteTeslaCarImageByImageUrl(string imageUrl);
     }
 }
