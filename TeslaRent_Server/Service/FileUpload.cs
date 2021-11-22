@@ -45,7 +45,7 @@ namespace TeslaRent_Server.Service
                 var path = Path.Combine(folderDirectory, fileName);
 
                 var memoryStream = new MemoryStream();
-                await file.OpenReadStream(maxFileSize).CopyToAsync(memoryStream);
+                await file.OpenReadStream().CopyToAsync(memoryStream);
 
                 if (!Directory.Exists(folderDirectory))
                     Directory.CreateDirectory(folderDirectory);

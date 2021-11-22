@@ -79,7 +79,7 @@ namespace Business.Repository
             {
                 return false;
             }
-           
+
         }
 
         public async Task<IEnumerable<TeslaCarImageDTO>?> GetTeslaCarImages(int carId)

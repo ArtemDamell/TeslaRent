@@ -11,13 +11,13 @@ namespace Business.Repository.IRepository
     public interface ITeslaCarImageRepository
     {
         // 56.1
-       Task<bool> CreateTeslaCarImage(TeslaCarImageDTO image);
+        public Task<bool> CreateTeslaCarImage(TeslaCarImageDTO image);
         // 56.2
-        Task<bool> DeleteTeslaCarImageByImageId(int imageId);
+        public Task<bool> DeleteTeslaCarImageByImageId(int imageId);
         // 56.3
-        Task<bool> DeleteTeslaCarImageByCarId(int carId);
+        public Task<bool> DeleteTeslaCarImageByCarId(int carId);
         // 56.4
-        Task<IEnumerable<TeslaCarImageDTO>?> GetTeslaCarImages(int carId);
+        public Task<IEnumerable<TeslaCarImageDTO>?> GetTeslaCarImages(int carId);
         // 70.1
         Task<bool> DeleteTeslaCarImageByImageUrl(string imageUrl);
     }
