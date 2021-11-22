@@ -84,7 +84,6 @@
 	// 31.3 Инициализируем массив значениями в методе жизненного цикла
 	protected override async Task OnInitializedAsync()
 	{
-		await Task.Delay(5000);
 		Cars = await _db.GetAllCars();
 	}
 

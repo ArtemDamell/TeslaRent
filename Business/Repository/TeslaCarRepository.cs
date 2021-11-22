@@ -58,18 +58,6 @@ namespace Business.Repository
 
 			if (carDetails is not null)
 			{
-				// 77.3 Модифицируем метод удаления
-				var alImages = await _db.TeslaCarImages.Where(x => x.CarId == carId).ToListAsync();
-
-                foreach (var item in alImages)
-                {
-					if (File.Exists(item.CarImageUrl))
-						File.Delete(item.CarImageUrl);
-                }
-				_db.TeslaCarImages.RemoveRange(alImages);
-				// *******************************************
-				// <-- Возвращаемся к реализации метода удаления в компонент CarList
-
 				_db.TeslaCars.Remove(carDetails);
 				return await _db.SaveChangesAsync();
 			}
@@ -85,13 +73,8 @@ namespace Business.Repository
 			 */
 			try
 			{
-				// Первоначальный вариант, на этапе 66 меняем его
-				//IEnumerable<TeslaCarDTO> teslaCarDTOs =
-				//	_mapper.Map<IEnumerable<TeslaCar>, IEnumerable<TeslaCarDTO>>(await _db.TeslaCars.ToListAsync());
-
-				// 66.2 Заставляем Entity Framework подтягивать внешнюю тблицу с картинками
 				IEnumerable<TeslaCarDTO> teslaCarDTOs =
-					_mapper.Map<IEnumerable<TeslaCar>, IEnumerable<TeslaCarDTO>>(await _db.TeslaCars.Include(x => x.TeslaCarImages).ToListAsync());
+					_mapper.Map<IEnumerable<TeslaCar>, IEnumerable<TeslaCarDTO>>(await _db.TeslaCars.ToListAsync());
 
 				return teslaCarDTOs;
 			}
@@ -106,13 +89,8 @@ namespace Business.Repository
 		{
 			try
 			{
-				// Первоначальный вариант, на этапе 66 меняем его
-				//TeslaCarDTO car = _mapper.Map<TeslaCar, TeslaCarDTO>(
-				//	await _db.TeslaCars.FindAsync(carId));
-
-				// 66.1 Заставляем Entity Framework подтягивать внешнюю тблицу с картинками
 				TeslaCarDTO car = _mapper.Map<TeslaCar, TeslaCarDTO>(
-					await _db.TeslaCars.Include(x => x.TeslaCarImages).FirstOrDefaultAsync(x => x.Id == carId));
+					await _db.TeslaCars.FindAsync(carId));
 
 				return car;
 			}
