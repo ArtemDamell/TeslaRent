@@ -2,3 +2,6 @@
 
 # S927: Parameter names should match base declaration and other partial definitions
 dotnet_diagnostic.S927.severity = none
+
+# CA2200: Rethrow to preserve stack details
+dotnet_diagnostic.CA2200.severity = none

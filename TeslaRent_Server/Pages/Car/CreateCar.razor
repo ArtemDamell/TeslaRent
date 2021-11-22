@@ -218,6 +218,7 @@
         catch (Exception ex)
         {
             // Do something with exception
+            await _js.ToastrError(ex.Message);
         }
 
         // На этом этапе переходим к внедрению зависимости нашего сервиса, шаг 30

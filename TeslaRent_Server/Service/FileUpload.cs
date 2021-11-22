@@ -38,8 +38,8 @@ namespace TeslaRent_Server.Service
         {
             try
             {
-                long maxFileSize = 1024 * 1024 * 15;
-                FileInfo fileInfo = new FileInfo(file.Name);
+                const long maxFileSize = 1024 * 1024 * 15;
+                FileInfo fileInfo = new(file.Name);
                 var fileName = Guid.NewGuid().ToString() + fileInfo.Extension;
                 var folderDirectory = $"{_webHostEnvironment.WebRootPath}\\CarImages";
                 var path = Path.Combine(folderDirectory, fileName);
