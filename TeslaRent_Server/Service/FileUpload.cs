@@ -38,13 +38,14 @@ namespace TeslaRent_Server.Service
         {
             try
             {
+                long maxFileSize = 1024 * 1024 * 15;
                 FileInfo fileInfo = new FileInfo(file.Name);
                 var fileName = Guid.NewGuid().ToString() + fileInfo.Extension;
                 var folderDirectory = $"{_webHostEnvironment.WebRootPath}\\CarImages";
                 var path = Path.Combine(folderDirectory, fileName);
 
                 var memoryStream = new MemoryStream();
-                await file.OpenReadStream().CopyToAsync(memoryStream);
+                await file.OpenReadStream(maxFileSize).CopyToAsync(memoryStream);
 
                 if (!Directory.Exists(folderDirectory))
                     Directory.CreateDirectory(folderDirectory);
@@ -54,7 +55,7 @@ namespace TeslaRent_Server.Service
                     memoryStream.WriteTo(fs);
                 }
 
-                var fullPath = $"RoomImages/{fileName}";
+                var fullPath = $"CarImages/{fileName}";
                 return fullPath;
             }
             catch (Exception ex)

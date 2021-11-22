@@ -15,6 +15,10 @@
 @inject IFileUpload _fileUpload
 @*62.3 Идём в класс Program и конфигурируем зависимость загрузчика*@
 
+@*65.3 Внедряем зависимость репозитория картинок*@
+@inject ITeslaCarImageRepository _imageRepository
+@*************************************************************@
+
 <div class="row mt-2 mb-5">
     <h3 class="card-title text-info mb-3 ml-3">@title Car</h3>
     <div class="col-12">
@@ -56,7 +60,38 @@
                     <div class="form-group mb-3">
                         <InputFile OnChange="ImageUploadHandler" multiple></InputFile>
                     </div>
-                    @*/////////////////////////////////////////////////*@
+                    @*////////////////////////////////////////////*@
+
+                    @*72. Отображаем индикатор загрузки*@
+                    @if (uploadsStart)
+                    {
+                        <div class="col">
+                            <span><i class="fas fa-spinner"></i>Please, wait when images are uploading ...</span>
+                        </div>
+                    }
+
+                    @*//////////////////////////////*@
+
+                    @*63. Блок вывода картинок*@
+                    <div class="row mb-3">
+                        @if (carModel.ImageUrls is not null && carModel.ImageUrls.Any())
+                        {
+                            int imageCount = 1;
+                            foreach (var item in carModel.ImageUrls)
+                            {
+                                <div class="col-sm-12 col-md-4 col-xl-3 mt-3">
+                                    <div class="car-image" style="background: url('@item') 50% 50%;">
+                                        <span class="car-image-title">@imageCount</span>
+                                        <span class="car-image-header"></span>
+                                        @*69.1 Добавить событие нажатия по кнопке*@
+                                        <button class="btn btn-outline-danger btn-block car-image-delete-button" type="button" @onclick="() => DeleteImage(item)"><span class="oi oi-trash"></span></button>
+                                    </div>
+                                </div>
+                                imageCount++;
+                            }
+                        }
+                    </div>
+                    @*////////////////////////////////////////////*@
 
                     <button class="btn btn-outline-primary" type="submit">@title Car</button>
                     <NavLink href="car-list" class="btn btn-outline-success">Back To Car List</NavLink>
@@ -76,11 +111,11 @@
     TeslaCarDTO carModel = new();
     string title = "Create";
 
-    // 46.1 Создаём метод инициализации значений компонента
-    // И последующей проверки, создаём мы или редактируем машину
-    protected override async Task OnInitializedAsync()
-    {
-        // Далее, перед реализацией, добавляем ещё один маршрут для редактирования
+	// 46.1 Создаём метод инициализации значений компонента
+	// И последующей проверки, создаём мы или редактируем машину
+	protected override async Task OnInitializedAsync()
+	{
+		// Далее, перед реализацией, добавляем ещё один маршрут для редактирования
 
         // 46.4 Реализовываем проверку, создаём или редактируем
         if (Id is not null)
@@ -88,6 +123,10 @@
             // Updating
             title = "Update";
             carModel = await _db.GetCar(Id.Value);
+
+            // 67. Заполняем модель картинками
+            if (carModel?.TeslaCarImages is not null)
+                carModel.ImageUrls = carModel.TeslaCarImages.Select(x => x.CarImageUrl).ToList();
         }
         else
         {
@@ -115,9 +154,32 @@
             {
                 // Update
                 var updateCarResult = await _db.UpdateCar(carModel.Id, carModel);
-
                 if (updateCarResult is not null)
                 {
+                    // 68. Обновление картинок при редактировании машины
+                    // Баг был сдесь, в условии блока IF
+                    if (carModel.ImageUrls is not null)
+                    {
+                        // 70.0
+                        if (DeletedImageNames is not null && DeletedImageNames.Any())
+                        {
+                            foreach (var item in DeletedImageNames)
+                            {
+                                var name = item.Replace($"CarImages/", "");
+
+                                var result = _fileUpload.DeleteFile(name);
+
+                                //70.1 На этом этспе идём в репозиторий и добавляем новый метод
+                                // 70.3
+                                await _imageRepository.DeleteTeslaCarImageByImageUrl(item);
+                            }
+                        }
+
+                        await AddCarImage(updateCarResult);
+                    }
+
+                    // *****************************************************************
+
                     await _js.ToastrSuccess($"{updateCarResult.Name} updating successful!");
                     _navManager.NavigateTo("car-list");
                 }
@@ -132,6 +194,9 @@
 
                 if (createdCar is not null)
                 {
+                    // 65.1 новый метод AddCarImage
+                    await AddCarImage(createdCar);
+                    // *************************************
                     await _js.ToastrSuccess($"{createdCar.Name} creating successful!");
                     _navManager.NavigateTo("car-list");
                 }
@@ -166,12 +231,14 @@
     // 62.1 Реализовываем метод обработки загрузки
     async Task ImageUploadHandler(InputFileChangeEventArgs e)
     {
+        // 73.1 / 73.2 Меняем значение блока отображения загрузки
+        uploadsStart = true;
         try
         {
             var images = new List<string>();
             if (e.GetMultipleFiles().Count > 0)
             {
-                foreach (var item in e.GetMultipleFiles())
+                foreach (var item in e.GetMultipleFiles(10))
                 {
                     System.IO.FileInfo fileInfo = new System.IO.FileInfo(item.Name);
 
@@ -203,6 +270,54 @@
                 else
                     await _js.ToastrError("Image uploading failed");
             }
+            // 73.2 / 73.2 Меняем значение блока отображения загрузки
+            uploadsStart = false;
+        }
+        catch (Exception ex)
+        {
+            await _js.ToastrError(ex.Message);
+        }
+    }
+
+    // 65.2 Реализовываем метод
+    async Task AddCarImage(TeslaCarDTO carDetails)
+    {
+        // Перед реализацией метода нам понадобится внедрить зависимость ITeslaCarRepository и добавить переменную для хранения
+        foreach (var item in carModel.ImageUrls)
+        {
+            if (carModel.TeslaCarImages is null || carModel.TeslaCarImages.Where(x => x.CarImageUrl == item).Count() == 0)
+            {
+                carImage = new()
+                    {
+                        CarId = carDetails.Id,
+                        CarImageUrl = item
+                    };
+                await _imageRepository.CreateTeslaCarImage(carImage);
+            }
+        }
+    }
+
+    // 69.2 Реализуем событие нажатия по кнопке Delete
+    async Task DeleteImage(string imageUrl)
+    {
+        try
+        {
+            var imageIndex = carModel.ImageUrls.FindIndex(x => x == imageUrl);
+            var imageName = imageUrl.Replace($"CarImages/", "");
+
+            // Create car
+            if (carModel.Id.Equals(0) && title == "Create")
+            {
+                var result = _fileUpload.DeleteFile(imageName);
+            }
+            else
+            {
+                // Update car
+                DeletedImageNames ??= new();
+                DeletedImageNames.Add(imageUrl);
+            }
+
+            carModel.ImageUrls.RemoveAt(imageIndex);
         }
         catch (Exception ex)
         {

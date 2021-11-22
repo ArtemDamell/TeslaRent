@@ -25,6 +25,7 @@ namespace Business.Repository
             {
                 var image = _mapper.Map<TeslaCarImageDTO, TeslaCarImage>(imageDTO);
                 await _db.TeslaCarImages.AddAsync(image);
+                await _db.SaveChangesAsync();
                 return true;
             }
             catch (Exception)
@@ -61,6 +62,24 @@ namespace Business.Repository
             {
                 return false;
             }
+        }
+
+        // 70.2
+        public async Task<bool> DeleteTeslaCarImageByImageUrl(string imageUrl)
+        {
+            try
+            {
+                var allImages = await _db.TeslaCarImages.FirstOrDefaultAsync(x => x.CarImageUrl.ToLower().Equals(imageUrl.ToLower()));
+
+                _db.TeslaCarImages.Remove(allImages);
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+           
         }
 
         public async Task<IEnumerable<TeslaCarImageDTO>?> GetTeslaCarImages(int carId)
