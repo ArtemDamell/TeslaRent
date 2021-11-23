@@ -105,3 +105,9 @@ a, .btn-link {
     border-radius: 0;
 }
 /***********************************************/
+.ql-container {
+    background-color: #fff;
+}
+.ql-toolbar {
+    background-color: #c1ddff;
+}

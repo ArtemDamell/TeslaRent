@@ -50,14 +50,49 @@
                         <InputText @bind-Value="carModel.NumberOfSeats" class="form-control" placeholder="Enter number of seats..." />
                         <ValidationMessage For="()=> carModel.NumberOfSeats" />
                     </div>
-                    <div class="form-group mb-3">
+                    <div class="form-group mb-3" style="height: 250px;">
                         <label>Details</label>
-                        <InputTextArea @bind-Value="carModel.Details" class="form-control" placeholder="Enter car description..." />
-                        <ValidationMessage For="()=> carModel.Details" />
+                        @*84.1 Вставляем визуальный редактор*@
+                        @*<InputTextArea @bind-Value="carModel.Details" class="form-control" placeholder="Enter car description..." />
+                            <ValidationMessage For="()=> carModel.Details" />*@
+
+                        <BlazoredTextEditor @ref="@QuillHtml" Placeholder="Please, enter car details ...">
+                            <ToolbarContent>
+                                <select class="ql-header">
+                                    <option selected=""></option>
+                                    <option value="1"></option>
+                                    <option value="2"></option>
+                                    <option value="3"></option>
+                                    <option value="4"></option>
+                                    <option value="5"></option>
+                                </select>
+                                <span class="ql-formats">
+                                    <button class="ql-bold"></button>
+                                    <button class="ql-italic"></button>
+                                    <button class="ql-underline"></button>
+                                    <button class="ql-strike"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <select class="ql-color"></select>
+                                    <select class="ql-background"></select>
+                                </span>
+                                <span class="ql-formats">
+                                    <button class="ql-list" value="ordered"></button>
+                                    <button class="ql-list" value="bullet"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <button class="ql-link"></button>
+                                </span>
+                            </ToolbarContent>
+                            <EditorContent>
+                               
+                            </EditorContent>
+                        </BlazoredTextEditor>
+
                     </div>
 
                     @*60.1 Реализовать вывод компонента загрузки файлов*@
-                    <div class="form-group mb-3">
+                    <div class="form-group mb-3" style="padding-top: 75px">
                         <InputFile OnChange="ImageUploadHandler" multiple></InputFile>
                     </div>
                     @*////////////////////////////////////////////*@
@@ -120,6 +155,9 @@
     // 71. Вводим новую переменную для индикации загрузки картинок
     bool uploadsStart;
 
+    // 84.2 Назначаем нужную переменную
+    public BlazoredTextEditor QuillHtml = new();
+
     // 46.1 Создаём метод инициализации значений компонента
     // И последующей проверки, создаём мы или редактируем машину
     protected override async Task OnInitializedAsync()
@@ -145,6 +183,30 @@
         // После этого, идём в компонент листа и реализовываем кнопку редактирования
     }
 
+    // 84.5 При инициализации компонента, устанавливаем значение описания в графический редактор
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        bool loading = true;
+        while(loading)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(carModel.Details))
+                    await this.QuillHtml.LoadHTMLContent(carModel.Details);
+                loading = false;
+            }
+            catch
+            {
+                await Task.Delay(10);
+                loading = true;
+            }
+
+        }
+    }
+
     // 48.1 Переименовываем метод в универсальный CreateUpdateCarHandler
     //async Task CreateNewCar()
     async Task CreateUpdateCarHandler()
@@ -162,6 +224,9 @@
             if (!carModel.Id.Equals(0) && title.Equals("Update"))
             {
                 // Update
+                // 84.4 При создании получаем данные из визуального редактора
+                carModel.Details = await QuillHtml.GetHTML();
+
                 var updateCarResult = await _db.UpdateCar(carModel.Id, carModel);
                 if (updateCarResult is not null)
                 {
@@ -199,6 +264,10 @@
             else
             {
                 // Create
+
+                // 84.4 При создании получаем данные из визуального редактора
+                carModel.Details = await QuillHtml.GetHTML();
+
                 var createdCar = await _db.CreateCar(carModel);
 
                 if (createdCar is not null)
@@ -212,7 +281,7 @@
                 else
                     await _js.ToastrError("Shit is happen.. Not created!");
 
-			}
+            }
 
         }
         catch (Exception ex)
@@ -220,69 +289,69 @@
             // Do something with exception
         }
 
-		// На этом этапе переходим к внедрению зависимости нашего сервиса, шаг 30
-		// 48.3 Переносим в блок Create
-		//var carDetailsByName = await _db.IsCarUnique(carModel.Name);
+        // На этом этапе переходим к внедрению зависимости нашего сервиса, шаг 30
+        // 48.3 Переносим в блок Create
+        //var carDetailsByName = await _db.IsCarUnique(carModel.Name);
 
-		//if (carDetailsByName is not null)
-		//{
-		//	// TODO: Show error
-		//	return;
-		//}
+        //if (carDetailsByName is not null)
+        //{
+        //	// TODO: Show error
+        //	return;
+        //}
 
-		//var createdCar = await _db.CreateCar(carModel);
+        //var createdCar = await _db.CreateCar(carModel);
 
-		//// TODO: Check creation status
+        //// TODO: Check creation status
 
-		//_navManager.NavigateTo("car-list");
-	}
+        //_navManager.NavigateTo("car-list");
+    }
 
-	// 62.1 Реализовываем метод обработки загрузки
-	async Task ImageUploadHandler(InputFileChangeEventArgs e)
-	{
-		try
-		{
-			var images = new List<string>();
-			if (e.GetMultipleFiles().Count > 0)
-			{
-				foreach (var item in e.GetMultipleFiles())
-				{
-					System.IO.FileInfo fileInfo = new System.IO.FileInfo(item.Name);
+    // 62.1 Реализовываем метод обработки загрузки
+    async Task ImageUploadHandler(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            var images = new List<string>();
+            if (e.GetMultipleFiles().Count > 0)
+            {
+                foreach (var item in e.GetMultipleFiles())
+                {
+                    System.IO.FileInfo fileInfo = new System.IO.FileInfo(item.Name);
 
-					if (fileInfo.Extension.ToLower() == ".jpg" ||
-						fileInfo.Extension.ToLower() == ".png" ||
-						fileInfo.Extension.ToLower() == ".jpeg")
-					{
-						// 62.2 На этом месте подключаем нужный Using и внедряем библиотеку
-						var uploadedImagePath = await _fileUpload.UploadFileAsync(item);
-						images.Add(uploadedImagePath);
-					}
-					else
-					{
-						await _js.ToastrError("Please select .jpg/.jpeg/.png files only");
-						return;
-					}
-				}
+                    if (fileInfo.Extension.ToLower() == ".jpg" ||
+                        fileInfo.Extension.ToLower() == ".png" ||
+                        fileInfo.Extension.ToLower() == ".jpeg")
+                    {
+                        // 62.2 На этом месте подключаем нужный Using и внедряем библиотеку
+                        var uploadedImagePath = await _fileUpload.UploadFileAsync(item);
+                        images.Add(uploadedImagePath);
+                    }
+                    else
+                    {
+                        await _js.ToastrError("Please select .jpg/.jpeg/.png files only");
+                        return;
+                    }
+                }
 
-				if (images.Any())
-				{
-					if (carModel.ImageUrls is not null && carModel.ImageUrls.Any())
-						carModel.ImageUrls.AddRange(images);
-					else
-					{
-						carModel.ImageUrls = new();
-						carModel.ImageUrls.AddRange(images);
-					}
-				}
-				else
-					await _js.ToastrError("Image uploading failed");
-			}
-		}
-		catch (Exception ex)
-		{
-			await _js.ToastrError(ex.Message);
-		}
-	}
+                if (images.Any())
+                {
+                    if (carModel.ImageUrls is not null && carModel.ImageUrls.Any())
+                        carModel.ImageUrls.AddRange(images);
+                    else
+                    {
+                        carModel.ImageUrls = new();
+                        carModel.ImageUrls.AddRange(images);
+                    }
+                }
+                else
+                    await _js.ToastrError("Image uploading failed");
+            }
+        }
+        catch (Exception ex)
+        {
+            await _js.ToastrError(ex.Message);
+        }
+    }
 
     // 65.2 Реализовываем метод
     async Task AddCarImage(TeslaCarDTO carDetails)
@@ -328,5 +397,14 @@
         {
             await _js.ToastrError(ex.Message);
         }
+    }
+
+    // 84.3 Определяем методы обработки редактора
+    public void SetHTML()
+    {
+        if (!string.IsNullOrWhiteSpace(carModel.Details))
+            this.QuillHtml.LoadHTMLContent(carModel.Details);
+
+        StateHasChanged();
     }
 }
