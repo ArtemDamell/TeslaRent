@@ -1,7 +1,9 @@
 ﻿@*27.1 Создаём маршрут к компоненту*@
 @page "/car-list"
+@using TeslaRent_Server.Service.IService
 @inject ITeslaCarRepository _db
 @inject IJSRuntime _js
+@inject IFileUpload _fileUpload
 
 @*27.2 Создаём разметку компонента*@
 <div class="row mt-4">
@@ -84,6 +86,17 @@
 	{
 		if (isConfirmed && DeletingCarId is not null)
 		{
+			// 79. Изменить метод удаления машин
+			var carDTO = await _db.GetCar(DeletingCarId.Value);
+			foreach(var item in carDTO.TeslaCarImages)
+			{
+				var imageName = item?.CarImageUrl?.Replace($"CarImages/", "");
+
+				if (imageName is not null)
+					_fileUpload.DeleteFile(imageName);
+			}
+			// *********************************
+
 			// 77.3 --> Идём и модифицируем метод удаления в TeslaCarRepository метод DeleteCar(int carId)
 			await _db.DeleteCar(DeletingCarId.Value);
 			await _js.ToastrSuccess($"{DeletingCarId.Value} deleting successful!");

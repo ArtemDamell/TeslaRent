@@ -58,6 +58,10 @@ namespace Business.Repository
 
 			if (carDetails is not null)
 			{
+				// 78. Получаем все картинки для удаления и удаляем их
+				var allImages = await _db.TeslaCarImages.Where(x => x.CarId == carId).ToListAsync();
+				_db.TeslaCarImages.RemoveRange(allImages);
+
 				_db.TeslaCars.Remove(carDetails);
 				return await _db.SaveChangesAsync();
 			}
