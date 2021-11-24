@@ -33,6 +33,9 @@ namespace Business.Mapper
             // ReverseMap() позволяет в автоматическом режиме делать обратную конвертацию
             // Этот метод работает только при полном совпадении названий свойств модели
             CreateMap<TeslaCarImage, TeslaCarImageDTO>().ReverseMap();
+
+            // 86. Выполнение домашнего задания
+            CreateMap<CarAccessory, CarAccessoryDTO>().ReverseMap();
         }
     }
 }

@@ -29,5 +29,8 @@ namespace DataAccess.Data
         // 53. Добавляем коллекцию для хранения картинок
         // Так, как свойство у нас виртуальное, миграции совершать не нужно!
         public virtual ICollection<TeslaCarImage>? TeslaCarImages { get; set; }
+
+        // 86. Домашнее задание
+        public virtual ICollection<CarAccessory>? CarAccessories { get; set; }
     }
 }

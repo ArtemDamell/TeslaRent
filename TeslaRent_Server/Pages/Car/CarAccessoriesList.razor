@@ -1,0 +1,87 @@
+﻿@*87.1 Назначаем путь к странице*@
+@page "/car/accessories-list"
+
+@inject ITeslaCarAccessoryRepository _db
+@inject ITeslaCarRepository _carDB
+
+<div class="row">
+    <div class="col-6">
+        <h1 class="text-info my-2">Accessories</h1>
+    </div>
+    <div class="col d-flex justify-content-end">
+        <button type="button" class="btn btn-success my-2" @onclick="AddAccessory"><i class="fa-solid fa-square-plus"></i> New Acessory</button>
+    </div>
+</div>
+
+@if (Accessories is null)
+{
+    <div class="alert alert-success text-center">
+        <span>Loading items ... Wait ...</span>
+    </div>
+}
+else if (Accessories.Any())
+{
+    <div class="row">
+    <div class="col">
+        <table class="table table-striped">
+            <thead class="bg-info">
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Icon</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Accessories)
+                {
+                          <tr>
+                            <td>@item.Name</td>
+                            <td>@item.Description</td>
+                            <td><i class="@item.Icon"></i></td>
+                            <td>
+                                    <div class="btn-group">
+                                        <button class="btn btn-outline-primary"><i class="fas fa-pen-square"></i></button>
+                                        <button class="btn btn-outline-warning"><i class="fa-brands fa-readme"></i></button>
+                                        <button class="btn btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                    </div>
+                            </td>
+                        </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+}
+else 
+{
+    <div class="alert alert-info text-center">
+        <span>No items ...</span>
+    </div>
+}
+
+<CreateUpdateAccessory OnAccessory="accessoryDTO" OnShowCloseModal="showCloseModal"  OnShowCloseHandler="ShowCloseModal" allCarsList="allCarsDTO" />
+
+@code {
+    IEnumerable<CarAccessoryDTO> Accessories;
+    bool showCloseModal = false;
+    CarAccessoryDTO accessoryDTO = new();
+    IEnumerable<TeslaCarDTO> allCarsDTO;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Accessories = await _db.GetAllAccessoriesAsync();
+        allCarsDTO = await _carDB.GetAllCars();
+    }
+
+    void AddAccessory()
+    {
+        showCloseModal = true;
+    }
+
+    async Task ShowCloseModal()
+    {
+        showCloseModal = !showCloseModal;
+        Accessories = await _db.GetAllAccessoriesAsync();
+    }
+}

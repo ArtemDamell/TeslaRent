@@ -14,5 +14,8 @@ namespace DataAccess.Data
 
         // 52. Добавляем таблицу картинок для машин
         public DbSet<TeslaCarImage> TeslaCarImages { get; set; }
+
+        // 87. Домашнее задание
+        public DbSet<CarAccessory> CarAccessories { get; set; }
     }
 }

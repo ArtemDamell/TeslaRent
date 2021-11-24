@@ -23,6 +23,9 @@ builder.Services.AddScoped<ITeslaCarRepository, TeslaCarRepository>();
 builder.Services.AddScoped<IFileUpload, FileUpload>();
 builder.Services.AddScoped<ITeslaCarImageRepository, TeslaCarImageRepository>();
 
+// 86. Домашнеезадание
+builder.Services.AddScoped<ITeslaCarAccessoryRepository, TeslaCarAccessoryRepository>();
+
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
