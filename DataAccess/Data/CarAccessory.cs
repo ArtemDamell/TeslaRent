@@ -26,6 +26,5 @@ namespace DataAccess.Data
         public string CreatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
         public string? UpdatedBy { get; set; }
-        public ICollection<TeslaCar>? Cars { get; set; }
     }
 }

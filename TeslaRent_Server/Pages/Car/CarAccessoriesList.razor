@@ -61,23 +61,22 @@ else
     </div>
 }
 
-<CreateUpdateAccessory OnAccessory="accessoryDTO" OnShowCloseModal="showCloseModal"  OnShowCloseHandler="ShowCloseModal" allCarsList="allCarsDTO" />
+<CreateUpdateAccessory OnAccessory="accessoryDTO" OnShowCloseModal="showCloseModal"  OnShowCloseHandler="ShowCloseModal" />
 
 @code {
     IEnumerable<CarAccessoryDTO> Accessories;
     bool showCloseModal = false;
     CarAccessoryDTO accessoryDTO = new();
-    IEnumerable<TeslaCarDTO> allCarsDTO;
 
     protected override async Task OnInitializedAsync()
     {
         Accessories = await _db.GetAllAccessoriesAsync();
-        allCarsDTO = await _carDB.GetAllCars();
+        
     }
 
-    void AddAccessory()
+    async Task AddAccessory()
     {
-        showCloseModal = true;
+        await ShowCloseModal(false);
     }
 
     async Task ShowCloseModal(bool update)

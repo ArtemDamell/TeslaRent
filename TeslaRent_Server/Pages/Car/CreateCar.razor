@@ -53,6 +53,32 @@
                         <InputText @bind-Value="carModel.NumberOfSeats" class="form-control" placeholder="Enter number of seats..." />
                         <ValidationMessage For="()=> carModel.NumberOfSeats" />
                     </div>
+
+                    @*87. Внедряем список комплектации*@
+                    <div class="mb-3">
+                        <select class="form-control form-select" @onchange="ChangeCurrentCarHandler">
+                            @if (accessories is not null)
+                            {
+                                <option selected value="">Select car accessories</option>
+                                @foreach (var item in accessories)
+                                {
+                                    <option value="@item.Id">@item.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    @if (carModel.CarAccessories is not null && carModel.CarAccessories.Any())
+                    {
+                        <div class="row mb-3">
+                            @foreach (var icon in carModel.CarAccessories)
+                            {
+                                <div class="col-1">
+                                    <i class="@icon.Icon" style="font-size: 50px;"></i>
+                                </div>
+                            }
+                        </div>
+                    }
+
                     <div class="form-group mb-3" style="height: 250px;">
                         <label>Details</label>
                         @*84.1 Вставляем визуальный редактор*@
@@ -91,30 +117,6 @@
 
                             </EditorContent>
                         </BlazoredTextEditor>
-
-                        @*87. Внедряем список комплектации*@
-                        <div class="mb-3" style="padding-top: 75px">
-                            <select class="form-control" @onchange="ChangeCurrentCarHandler">
-                                @if (carModel.CarAccessories is not null)
-                                {
-                                    @foreach (var item in carModel.CarAccessories)
-                                    {
-                                        <option value="@item.Id">@item.Name</option>
-                                    }
-                                }
-                            </select>
-                        </div>
-                        @if(carModel.CarAccessories is not null && carModel.CarAccessories.Any())
-                        {
-                            @foreach(var icon in carModel.CarAccessories)
-                            {
-                                <div class="row mb-3">
-                                <div class="col-2">
-                                    <i class="@icon"></i>
-                                </div>
-                            </div>
-                            }
-                        }
                     </div>
 
                     @*60.1 Реализовать вывод компонента загрузки файлов*@
@@ -184,6 +186,8 @@
     // 84.2 Назначаем нужную переменную
     public BlazoredTextEditor QuillHtml = new();
 
+    List<CarAccessoryDTO> accessories;
+
     // 46.1 Создаём метод инициализации значений компонента
     // И последующей проверки, создаём мы или редактируем машину
     protected override async Task OnInitializedAsync()
@@ -196,6 +200,17 @@
             // Updating
             title = "Update";
             carModel = await _db.GetCar(Id.Value);
+            var tempAccessories = await _acc.GetAllAccessoriesAsync();
+            accessories = tempAccessories.ToList();
+
+            // Updating accessories
+            if (carModel.CarAccessories is not null && carModel.CarAccessories.Any())
+            {
+                foreach (var item in carModel.CarAccessories.ToList())
+                {
+                    accessories.Remove(item);
+                }
+            }
 
             // 67. Заполняем модель картинками
             if (carModel?.TeslaCarImages is not null)
@@ -205,6 +220,8 @@
         {
             // Creating
             carModel = new();
+            var tempAccessories = await _acc.GetAllAccessoriesAsync();
+            accessories = tempAccessories.ToList();
         }
         // После этого, идём в компонент листа и реализовываем кнопку редактирования
     }
@@ -438,14 +455,23 @@
 
     async Task ChangeCurrentCarHandler(ChangeEventArgs args)
     {
-        var accId = Convert.ToInt32(args.Value);
-
-        if (carModel.CarAccessories.FirstOrDefault(x => x.Id == accId) == null)
+        if (!string.IsNullOrWhiteSpace(args.Value.ToString()))
         {
-            // Получаем обьъект для добавления
-            var accessory = await _acc.GetSingleAccessoryAsync(accId);
+            var accId = Convert.ToInt32(args.Value);
 
-            carModel.CarAccessories.Add(accessory);
+            if (carModel.CarAccessories.FirstOrDefault(x => x.Id == accId) == null)
+            {
+                // Получаем обьъект для добавления
+                var accessory = await _acc.GetSingleAccessoryAsync(accId);
+
+                accessory.Car = carModel;
+                carModel.CarAccessories.Add(accessory);
+
+                var listItem = accessories.FirstOrDefault(x => x.Id == accessory.Id);
+                accessories.Remove(listItem);
+
+                StateHasChanged();
+            }
         }
     }
 }

@@ -149,6 +149,11 @@ namespace Business.Repository
 					// Получаем данные из базы
 					var carDetailsFromDb = await _db.TeslaCars.FindAsync(carId);
 
+                    foreach (var item in carForUpdating.CarAccessories)
+                    {
+						item.CarId = carId;
+                    }
+
 					// Конвертируем полученные данные из DTO в обычную модель для сохранения в базе
 					var car = _mapper.Map<TeslaCarDTO, TeslaCar>(carForUpdating, carDetailsFromDb);
 

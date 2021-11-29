@@ -34,24 +34,6 @@
                                     <InputText @bind-Value="OnAccessory.Icon" class="form-control" placeholder="Enter accessory icon class..." />
                                     <ValidationMessage For="() => OnAccessory.Icon" />
                                 </div>
-                               @* <div class="mb-3">
-                                    <select class="form-control" @onchange="ChangeCurrentCarHandler">
-                                        @if (allCarsList is not null)
-                                        {
-                                            @foreach (var item in allCarsList)
-                                            {
-                                                @if (!OnAccessory.Id.Equals(0) && OnAccessory.CarId.Equals(item.Id))
-                                                {
-                                                    <option selected value="@item.Id">@item.Name</option>
-                                                }
-                                                else
-                                                {
-                                                    <option value="@item.Id">@item.Name</option>
-                                                }
-                                            }
-                                        }
-                                    </select>
-                                </div>*@
                             </div>
                         </div>
                     </div>
