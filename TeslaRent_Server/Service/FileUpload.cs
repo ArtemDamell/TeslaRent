@@ -8,9 +8,14 @@ namespace TeslaRent_Server.Service
     {
         // 59.1 Чтобы использовать папку wwwroot нам необходимо внедрить зависимость
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public FileUpload(IWebHostEnvironment webHostEnvironment)
+
+        // 92.1 Внедряем зависимость HttpContextAccessor
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public FileUpload(IWebHostEnvironment webHostEnvironment, IHttpContextAccessor httpContextAccessor)
         {
             _webHostEnvironment = webHostEnvironment;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // 59.3 Реализовываем метод удаления картинок
@@ -55,7 +60,9 @@ namespace TeslaRent_Server.Service
                     memoryStream.WriteTo(fs);
                 }
 
-                var fullPath = $"CarImages/{fileName}";
+                // 92.2 Составляем абсолютный путь
+                var url = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host.Value}/";
+                var fullPath = $"{url}CarImages/{fileName}";
                 return fullPath;
             }
             catch (Exception ex)

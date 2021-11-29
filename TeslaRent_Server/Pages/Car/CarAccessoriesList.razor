@@ -2,7 +2,8 @@
 @page "/car/accessories-list"
 
 @inject ITeslaCarAccessoryRepository _db
-@inject ITeslaCarRepository _carDB
+
+@inject IJSRuntime _js
 
 <div class="row">
     <div class="col-6">
@@ -42,8 +43,8 @@ else if (Accessories.Any())
                             <td>
                                     <div class="btn-group">
                                         <button class="btn btn-outline-primary"><i class="fas fa-pen-square"></i></button>
-                                        <button class="btn btn-outline-warning"><i class="fa-brands fa-readme"></i></button>
-                                        <button class="btn btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                        <button class="btn btn-outline-success"><i class="fa-brands fa-readme"></i></button>
+                                        <button class="btn btn-outline-danger" @onclick="() => DeleteAccessory(item)"><i class="fas fa-trash"></i></button>
                                     </div>
                             </td>
                         </tr>
@@ -79,9 +80,22 @@ else
         showCloseModal = true;
     }
 
-    async Task ShowCloseModal()
+    async Task ShowCloseModal(bool update)
     {
+        if (update)
+            Accessories = await _db.GetAllAccessoriesAsync();
+
         showCloseModal = !showCloseModal;
-        Accessories = await _db.GetAllAccessoriesAsync();
+    }
+
+    async Task DeleteAccessory(CarAccessoryDTO accessory)
+    {
+        var result = await _db.DeleteAccessoryAsync(accessory.Id);
+
+        if (result)
+        {
+            await _js.ToastrSuccess($"{accessory.Name} Deleting successful");
+            Accessories = await _db.GetAllAccessoriesAsync();
+        }
     }
 }

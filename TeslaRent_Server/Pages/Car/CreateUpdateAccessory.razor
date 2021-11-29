@@ -1,5 +1,5 @@
 ﻿@inject ITeslaCarAccessoryRepository _db
-@inject ITeslaCarRepository _carDB
+@inject IJSRuntime _js
 
 @if (OnShowCloseModal)
 {
@@ -10,7 +10,7 @@
 
                     <div class="modal-header bg-success">
                         <h5 class="modal-title text-white" id="exModalLabel">@title Accessory</h5>
-                        <button type="button" class="btn-close bg-white" @onclick="OnShowCloseHandler" datadata-dismiss="modal" aria-label="Close">
+                        <button type="button" class="btn-close bg-white" @onclick="() => OnShowCloseHandler.InvokeAsync(false)" datadata-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true"></span>
                         </button>
                     </div>
@@ -34,7 +34,7 @@
                                     <InputText @bind-Value="OnAccessory.Icon" class="form-control" placeholder="Enter accessory icon class..." />
                                     <ValidationMessage For="() => OnAccessory.Icon" />
                                 </div>
-                                <div class="mb-3">
+                               @* <div class="mb-3">
                                     <select class="form-control" @onchange="ChangeCurrentCarHandler">
                                         @if (allCarsList is not null)
                                         {
@@ -51,7 +51,7 @@
                                             }
                                         }
                                     </select>
-                                </div>
+                                </div>*@
                             </div>
                         </div>
                     </div>
@@ -59,7 +59,7 @@
                         <button class="btn btn-outline-success" type="submit">
                             @title accessory
                         </button>
-                        <button class="btn btn-outline-secondary" type="button" @onclick="OnShowCloseHandler" data-dismiss="modal">
+                        <button class="btn btn-outline-secondary" type="button" @onclick="() => OnShowCloseHandler.InvokeAsync(false)" data-dismiss="modal">
                             Cancel
                         </button>
                     </div>
@@ -72,41 +72,33 @@
 @code {
     [Parameter] public bool OnShowCloseModal { get; set; }
     [Parameter] public CarAccessoryDTO OnAccessory { get; set; }
-    [Parameter] public IEnumerable<TeslaCarDTO> allCarsList { get; set; }
 
-    [Parameter] public EventCallback OnShowCloseHandler { get; set; }
+    [Parameter] public EventCallback<bool> OnShowCloseHandler { get; set; }
 
     string title = "Create";
 
-
-    protected override async Task OnInitializedAsync()
-    {
-        allCarsList = await _carDB.GetAllCars();
-    }
-
-    void SubmitHandler()
+    async Task SubmitHandler()
     {
         if (OnAccessory.Id.Equals(0))
         {
-            if (OnAccessory.CarId.Equals(0))
-                OnAccessory.CarId = 1;
-            var result = _db.CreateAccessoryAsync(OnAccessory);
+            var result = await _db.CreateAccessoryAsync(OnAccessory);
 
             if (result is not null)
-                OnShowCloseHandler.InvokeAsync();
+            {
+                await _js.ToastrSuccess($"{result.Name} Creating successful!");
+                await OnShowCloseHandler.InvokeAsync(true);
+            }
         }
         else
         {
-            var result = _db.UpdateAccessoryAsync(OnAccessory);
+            var result = await _db.UpdateAccessoryAsync(OnAccessory);
 
             if (result is not null)
-                OnShowCloseHandler.InvokeAsync();
+            {
+                await _js.ToastrSuccess($"{result.Name} Updating successful!");
+                await OnShowCloseHandler.InvokeAsync(true);
+            }
         }
 
-    }
-
-    void ChangeCurrentCarHandler(ChangeEventArgs args)
-    {
-        OnAccessory.CarId = Convert.ToInt32(args.Value);
     }
 }

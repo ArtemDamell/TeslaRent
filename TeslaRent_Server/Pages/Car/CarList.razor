@@ -5,6 +5,9 @@
 @inject IJSRuntime _js
 @inject IFileUpload _fileUpload
 
+@*90.1 Внедряем менеджер для получения базового пути*@
+@inject NavigationManager _navManager
+
 @*27.2 Создаём разметку компонента*@
 <div class="row mt-4">
 	<div class="col-8">
@@ -25,6 +28,7 @@
 					<th>Occupancy</th>
 					<th>Rate</th>
 					<th>Number of seats</th>
+					<th>Accessories</th>
 					<th></th>
 				</tr>
 			</thead>
@@ -38,6 +42,15 @@
 						   <td>@item.Occupancy</td>
 						   <td>@item.RegularRate</td>
 						   <td>@item.NumberOfSeats</td>
+						   <td>
+							   @if (item.CarAccessories is not null && item.CarAccessories.Any())
+							   {
+								   @foreach (var icon in item.CarAccessories)
+								   {
+									   <i class="@icon"></i>
+								   }
+							   }
+						   </td>
 						   <td>
 							   @*47. Реализовываем кнопку редактирования машины*@
 							   <NavLink class="btn btn-primary" href="@($"car-list/edit/{item.Id}")">Edit</NavLink>
@@ -90,7 +103,8 @@
 			var carDTO = await _db.GetCar(DeletingCarId.Value);
 			foreach(var item in carDTO.TeslaCarImages)
 			{
-				var imageName = item?.CarImageUrl?.Replace($"CarImages/", "");
+				// 90.2 Меняем путь на абсолютный
+				var imageName = item?.CarImageUrl?.Replace($"{_navManager.BaseUri}CarImages/", "");
 
 				if (imageName is not null)
 					_fileUpload.DeleteFile(imageName);

@@ -5,26 +5,41 @@ using Business.Repository.IRepository;
 using Business.Repository;
 using TeslaRent_Server.Service.IService;
 using TeslaRent_Server.Service;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// 10. Внедряем конфигурацию базы данных
+// 10. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 builder.Services.AddDbContext<ApplicationDbContext>(options => 
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// 99. Р’ РїРѕСЃР»РµРґРЅРµР№ РІРµСЂСЃРёРё .NET СЌС‚Рѕ СЃРґРµР»Р°Р»РѕСЃСЊ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё, РЅРѕ С‚СѓС‚ РЅРµС‚ СЂРѕР»РµР№! РџР•Р Р•РџРРЎР«Р’РђР•Рњ!!!
+//builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+//    .AddEntityFrameworkStores<ApplicationDbContext>();
+//
+//    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//    options.UseSqlServer("ConnectionString"));
 
-// 23. Внедряем зависимость AutoMapper в наше приложение
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders()
+    .AddDefaultUI();
+
+// 23. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ AutoMapper пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-// 30. Внедряем и конфигурируем сервис, добавил ссылку на проект
+// 30. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 builder.Services.AddScoped<ITeslaCarRepository, TeslaCarRepository>();
 
-// 62.3. Конфигурируем зависимость загрузчика и класс загрузки
+// 62.3. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 builder.Services.AddScoped<IFileUpload, FileUpload>();
 builder.Services.AddScoped<ITeslaCarImageRepository, TeslaCarImageRepository>();
 
-// 86. Домашнеезадание
+// 86. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 builder.Services.AddScoped<ITeslaCarAccessoryRepository, TeslaCarAccessoryRepository>();
+
+// 91. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ HttpContexntAccessor
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -47,6 +62,12 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// 94.1 РљРѕРЅС„РёРіСѓСЂРёСЂСѓРµРј СЃРёСЃС‚РµРјСѓ Identity
+app.UseAuthentication();
+app.UseAuthorization();
+
+// 94.2 РљРѕРЅС„РёРіСѓСЂРёСЂСѓРµРј СЃРёСЃС‚РµРјСѓ Identity
+app.MapRazorPages();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");

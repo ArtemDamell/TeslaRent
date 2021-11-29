@@ -18,6 +18,9 @@
 @*65.3 Внедряем зависимость репозитория картинок*@
 @inject ITeslaCarImageRepository _imageRepository
 @*************************************************************@
+@using System.Linq
+@inject ITeslaCarAccessoryRepository _acc
+@inject NavigationManager _navManager
 
 <div class="row mt-2 mb-5">
     <h3 class="card-title text-info mb-3 ml-3">@title Car</h3>
@@ -85,10 +88,33 @@
                                 </span>
                             </ToolbarContent>
                             <EditorContent>
-                               
+
                             </EditorContent>
                         </BlazoredTextEditor>
 
+                        @*87. Внедряем список комплектации*@
+                        <div class="mb-3" style="padding-top: 75px">
+                            <select class="form-control" @onchange="ChangeCurrentCarHandler">
+                                @if (carModel.CarAccessories is not null)
+                                {
+                                    @foreach (var item in carModel.CarAccessories)
+                                    {
+                                        <option value="@item.Id">@item.Name</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        @if(carModel.CarAccessories is not null && carModel.CarAccessories.Any())
+                        {
+                            @foreach(var icon in carModel.CarAccessories)
+                            {
+                                <div class="row mb-3">
+                                <div class="col-2">
+                                    <i class="@icon"></i>
+                                </div>
+                            </div>
+                            }
+                        }
                     </div>
 
                     @*60.1 Реализовать вывод компонента загрузки файлов*@
@@ -190,7 +216,7 @@
             return;
 
         bool loading = true;
-        while(loading)
+        while (loading)
         {
             try
             {
@@ -239,7 +265,8 @@
                         {
                             foreach (var item in DeletedImageNames)
                             {
-                                var name = item.Replace($"CarImages/", "");
+                                // 90.3 Меняем путь на абсолютный
+                                var name = item.Replace($"{_navManager.BaseUri}CarImages/", "");
 
                                 var result = _fileUpload.DeleteFile(name);
 
@@ -335,7 +362,7 @@
 
                 if (images.Any())
                 {
-                    if (carModel.ImageUrls is not null && carModel.ImageUrls.Any())
+                    if (carModel.ImageUrls is not null)
                         carModel.ImageUrls.AddRange(images);
                     else
                     {
@@ -377,7 +404,8 @@
         try
         {
             var imageIndex = carModel.ImageUrls.FindIndex(x => x == imageUrl);
-            var imageName = imageUrl.Replace($"CarImages/", "");
+            // 90.4 Меняем путь на абсолютный
+            var imageName = imageUrl.Replace($"{_navManager.BaseUri}CarImages/", "");
 
             // Create car
             if (carModel.Id.Equals(0) && title == "Create")
@@ -406,5 +434,18 @@
             this.QuillHtml.LoadHTMLContent(carModel.Details);
 
         StateHasChanged();
+    }
+
+    async Task ChangeCurrentCarHandler(ChangeEventArgs args)
+    {
+        var accId = Convert.ToInt32(args.Value);
+
+        if (carModel.CarAccessories.FirstOrDefault(x => x.Id == accId) == null)
+        {
+            // Получаем обьъект для добавления
+            var accessory = await _acc.GetSingleAccessoryAsync(accId);
+
+            carModel.CarAccessories.Add(accessory);
+        }
     }
 }

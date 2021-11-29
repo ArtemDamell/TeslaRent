@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Data
 {
     // 6.1 Реализовываем класс
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext
     {
         // 6.2 Настраиваем параметры контекста данных
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)

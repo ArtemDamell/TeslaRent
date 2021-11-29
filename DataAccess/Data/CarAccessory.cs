@@ -19,14 +19,13 @@ namespace DataAccess.Data
         public string Description { get; set; }
         [Required]
         public string Icon { get; set; }
-        public int? CarId { get; set; }
-        [ForeignKey(nameof(CarId))]
-        public TeslaCar? Car { get; set; }
+        public ICollection<TeslaCar>? Car { get; set; }
         [Required]
         public DateTime CreatedDate { get; set; }
         [Required]
         public string CreatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
         public string? UpdatedBy { get; set; }
+        public ICollection<TeslaCar>? Cars { get; set; }
     }
 }

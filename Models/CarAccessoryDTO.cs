@@ -20,6 +20,6 @@ namespace Models
         [Required]
         public string Icon { get; set; }
         public int? CarId { get; set; }
-        public TeslaCarDTO? Car { get; set; }
+        public ICollection<TeslaCarDTO>? Car { get; set; }
     }
 }

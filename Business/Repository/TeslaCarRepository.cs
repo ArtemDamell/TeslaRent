@@ -78,7 +78,7 @@ namespace Business.Repository
 			try
 			{
 				IEnumerable<TeslaCarDTO> teslaCarDTOs =
-					_mapper.Map<IEnumerable<TeslaCar>, IEnumerable<TeslaCarDTO>>(await _db.TeslaCars.ToListAsync());
+					_mapper.Map<IEnumerable<TeslaCar>, IEnumerable<TeslaCarDTO>>(await _db.TeslaCars.Include(x => x.CarAccessories).ToListAsync());
 
 				return teslaCarDTOs;
 			}

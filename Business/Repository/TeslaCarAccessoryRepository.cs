@@ -31,7 +31,7 @@ namespace Business.Repository
                 carForCreation.CreatedDate = DateTime.UtcNow;
                 carForCreation.CreatedBy = "";
 
-                var createdCar = await _db.AddAsync(carForCreation);
+                var createdCar = await _db.CarAccessories.AddAsync(carForCreation);
                 await _db.SaveChangesAsync();
 
                 return _mapper.Map<CarAccessory, CarAccessoryDTO>(createdCar.Entity);
@@ -48,7 +48,7 @@ namespace Business.Repository
             {
                 var accessoryForDeleting = await _db.CarAccessories.FindAsync(accessoryId);
 
-                _db.Remove(accessoryForDeleting);
+                _db.CarAccessories.Remove(accessoryForDeleting);
                 await _db.SaveChangesAsync();
 
                 return true;
@@ -94,10 +94,10 @@ namespace Business.Repository
                 accessoryForUpdating.UpdatedBy = "";
 
 
-                _db.CarAccessories.Update(accessoryForUpdating);
+                var result  = _db.Update(accessoryForUpdating);
                 await _db.SaveChangesAsync();
 
-                return _mapper.Map<CarAccessory, CarAccessoryDTO>(accessoryForUpdating);
+                return _mapper.Map<CarAccessory, CarAccessoryDTO>(result.Entity);
             }
             catch (Exception ex)
             {
