@@ -464,7 +464,7 @@
                 // Получаем обьъект для добавления
                 var accessory = await _acc.GetSingleAccessoryAsync(accId);
 
-                accessory.Car = carModel;
+                accessory?.Car?.Add(carModel);
                 carModel.CarAccessories.Add(accessory);
 
                 var listItem = accessories.FirstOrDefault(x => x.Id == accessory.Id);
