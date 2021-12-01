@@ -140,7 +140,7 @@ namespace Business.Repository
 			}
 		}
 
-		public async Task<TeslaCarDTO> UpdateCar(int carId, TeslaCarDTO carForUpdating)
+		public async Task<TeslaCarDTO> UpdateCar(int carId, TeslaCarDTO carForUpdating, List<CarAccessoryDTO> accessoriesForAdding)
 		{
 			try
 			{
@@ -150,6 +150,7 @@ namespace Business.Repository
 					var carDetailsFromDb = await _db.TeslaCars.FirstOrDefaultAsync(x => x.Id == carId);
 					// Конвертируем полученные данные из DTO в обычную модель для сохранения в базе
 					var car = _mapper.Map<TeslaCarDTO, TeslaCar>(carForUpdating, carDetailsFromDb);
+					var acessories = _mapper.Map<List<CarAccessoryDTO>, List<CarAccessory>>(accessoriesForAdding);
 
 					// Добавляем недостающие свойства
 					car.UpdatedBy = "";
