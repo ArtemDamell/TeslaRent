@@ -140,7 +140,7 @@ namespace Business.Repository
 			}
 		}
 
-		public async Task<TeslaCarDTO> UpdateCar(int carId, TeslaCarDTO carForUpdating)
+		public async Task<TeslaCarDTO> UpdateCar(int carId, TeslaCarDTO carForUpdating, List<CarAccessoryDTO> accessoriesForAdding)
 		{
 			try
 			{
@@ -149,17 +149,19 @@ namespace Business.Repository
 					// Получаем данные из базы
 					var carDetailsFromDb = await _db.TeslaCars.FindAsync(carId);
 
-                    foreach (var item in carForUpdating.CarAccessories)
-                    {
-						item.CarId = carId;
-                    }
-
 					// Конвертируем полученные данные из DTO в обычную модель для сохранения в базе
 					var car = _mapper.Map<TeslaCarDTO, TeslaCar>(carForUpdating, carDetailsFromDb);
+					var acessories = _mapper.Map<List<CarAccessoryDTO>, List<CarAccessory>>(accessoriesForAdding);
 
 					// Добавляем недостающие свойства
 					car.UpdatedBy = "";
 					car.UpdatedDate = DateTime.UtcNow;
+
+                    foreach (var item in acessories)
+                    {
+						car.CarAccessories.Add(item);
+                    }
+					
 
 					// Обновляем данные в сущностях Entity
 					var updatedCar = _db.Update(car);

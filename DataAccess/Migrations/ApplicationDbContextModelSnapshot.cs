@@ -34,7 +34,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("CarId");
 
-                    b.ToTable("CarAccessoryTeslaCar");
+                    b.ToTable("CarAccessoryTeslaCar", (string)null);
                 });
 
             modelBuilder.Entity("DataAccess.Data.CarAccessory", b =>
@@ -74,7 +74,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CarAccessories");
+                    b.ToTable("CarAccessories", (string)null);
                 });
 
             modelBuilder.Entity("DataAccess.Data.TeslaCar", b =>
@@ -118,7 +118,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TeslaCars");
+                    b.ToTable("TeslaCars", (string)null);
                 });
 
             modelBuilder.Entity("DataAccess.Data.TeslaCarImage", b =>
@@ -139,7 +139,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("CarId");
 
-                    b.ToTable("TeslaCarImages");
+                    b.ToTable("TeslaCarImages", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
