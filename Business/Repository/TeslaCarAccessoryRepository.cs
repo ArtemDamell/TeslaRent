@@ -63,7 +63,8 @@ namespace Business.Repository
         {
             try
             {
-                var allAccessories = _mapper.Map<IEnumerable<CarAccessory>, IEnumerable< CarAccessoryDTO>>(await _db.CarAccessories.ToListAsync());
+                var acc = await _db.CarAccessories.ToListAsync();
+                var allAccessories = _mapper.Map<IEnumerable<CarAccessory>, IEnumerable< CarAccessoryDTO>>(acc);
                 return allAccessories;
             }
             catch (Exception ex)
@@ -76,7 +77,9 @@ namespace Business.Repository
         {
             try
             {
-                return _mapper.Map<CarAccessory, CarAccessoryDTO>(await _db.CarAccessories.FindAsync(accessoryId));
+                var accessory = await _db.CarAccessories.AsNoTracking().FirstOrDefaultAsync(x => x.Id == accessoryId);
+                
+                return _mapper.Map<CarAccessory, CarAccessoryDTO>(accessory);
             }
             catch (Exception ex)
             {

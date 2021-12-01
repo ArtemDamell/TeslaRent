@@ -78,7 +78,7 @@ namespace Business.Repository
 			try
 			{
 				IEnumerable<TeslaCarDTO> teslaCarDTOs =
-					_mapper.Map<IEnumerable<TeslaCar>, IEnumerable<TeslaCarDTO>>(await _db.TeslaCars.Include(x => x.CarAccessories).ToListAsync());
+					_mapper.Map<IEnumerable<TeslaCar>, IEnumerable<TeslaCarDTO>>(await _db.TeslaCars.AsNoTracking().Include(x => x.CarAccessories).ToListAsync());
 
 				return teslaCarDTOs;
 			}
@@ -94,7 +94,7 @@ namespace Business.Repository
 			try
 			{
 				TeslaCarDTO car = _mapper.Map<TeslaCar, TeslaCarDTO>(
-					await _db.TeslaCars.FindAsync(carId));
+					await _db.TeslaCars.AsNoTracking().Include(x => x.CarAccessories).FirstOrDefaultAsync(x => x.Id == carId));
 
 				return car;
 			}
@@ -147,13 +147,7 @@ namespace Business.Repository
 				if (carId == carForUpdating.Id)
 				{
 					// Получаем данные из базы
-					var carDetailsFromDb = await _db.TeslaCars.FindAsync(carId);
-
-                    foreach (var item in carForUpdating.CarAccessories)
-                    {
-						item.CarId = carId;
-                    }
-
+					var carDetailsFromDb = await _db.TeslaCars.FirstOrDefaultAsync(x => x.Id == carId);
 					// Конвертируем полученные данные из DTO в обычную модель для сохранения в базе
 					var car = _mapper.Map<TeslaCarDTO, TeslaCar>(carForUpdating, carDetailsFromDb);
 
@@ -161,13 +155,16 @@ namespace Business.Repository
 					car.UpdatedBy = "";
 					car.UpdatedDate = DateTime.UtcNow;
 
+					
+					
+
 					// Обновляем данные в сущностях Entity
 					var updatedCar = _db.Update(car);
 
 					// Сохраняем изменения в базе данных
 					await _db.SaveChangesAsync();
 
-					return _mapper.Map<TeslaCar, TeslaCarDTO>(updatedCar.Entity);
+					return _mapper.Map<TeslaCar, TeslaCarDTO>(car);
 				}
 				else
 				{

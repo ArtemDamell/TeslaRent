@@ -169,6 +169,8 @@
     // 46.3 Добавляем свойство параметра для маршрута
     [Parameter] public int? Id { get; set; }
 
+    [Parameter] public EventCallback OnUpdateListHandler {  get; set; } 
+
     // 29.3 Добавляем модель данных DTO, добавив ссылку на проект Models
     // Модели будут использоваться во всём проекте, поэтому добавляем using глобально
     TeslaCarDTO carModel = new();
@@ -200,6 +202,7 @@
             // Updating
             title = "Update";
             carModel = await _db.GetCar(Id.Value);
+
             var tempAccessories = await _acc.GetAllAccessoriesAsync();
             accessories = tempAccessories.ToList();
 
@@ -463,14 +466,12 @@
             {
                 // Получаем обьъект для добавления
                 var accessory = await _acc.GetSingleAccessoryAsync(accId);
+                accessory.Car.Add(carModel);
 
-                accessory?.Car?.Add(carModel);
                 carModel.CarAccessories.Add(accessory);
 
                 var listItem = accessories.FirstOrDefault(x => x.Id == accessory.Id);
                 accessories.Remove(listItem);
-
-                StateHasChanged();
             }
         }
     }

@@ -47,7 +47,7 @@
 							   {
 								   @foreach (var icon in item.CarAccessories)
 								   {
-									   <i class="@icon"></i>
+									   <i class="@icon.Icon" style="margin-right: 5px; font-size: 30px;"></i>
 								   }
 							   }
 						   </td>
@@ -131,4 +131,9 @@
 		ShowCloseModal = !ShowCloseModal;
 
 	}
+
+	//async Task UpdateHandler()
+	//{
+	//	Cars = await _db.GetAllCars();
+	//}
 }
