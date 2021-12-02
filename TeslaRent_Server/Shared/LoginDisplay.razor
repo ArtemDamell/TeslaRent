@@ -1,7 +1,18 @@
 ﻿@*96.1 Добавляем меню авторизации*@
-<NavLink href="Identity/Account/Register">Register</NavLink>
-<NavLink href="Identity/Account/Login">Login</NavLink>
 
+@*100. Добавляем LogOut и AuthorizedView*@
+<AuthorizeView>
+    <Authorized>
+        Hello, @context.User.Identity.Name
+        <NavLink href="Identity/Account/Logout">Logout</NavLink>
+    </Authorized>
+    <NotAuthorized>
+        <NavLink href="Identity/Account/Register">Register</NavLink>
+        <NavLink href="Identity/Account/Login">Login</NavLink>
+    </NotAuthorized>
+</AuthorizeView>
+
+@*************************************@
 @code {
 
 }

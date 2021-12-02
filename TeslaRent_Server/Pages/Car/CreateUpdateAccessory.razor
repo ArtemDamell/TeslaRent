@@ -1,6 +1,9 @@
 ﻿@inject ITeslaCarAccessoryRepository _db
 @inject IJSRuntime _js
 
+@*106. Добавляем атрибут доступа только для авторизованных пользователей*@
+@attribute [Authorize]
+
 @if (OnShowCloseModal)
 {
     <div class="modal show fade" data-backdrop="static" data-keyboard="false" id="deleteConfModal" tabindex="-1" role="dialog" style="display: block;">
