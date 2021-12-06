@@ -1,6 +1,5 @@
 using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
-using AutoMapper;
 using Business.Repository.IRepository;
 using Business.Repository;
 using TeslaRent_Server.Service.IService;
@@ -49,6 +48,9 @@ builder.Services.AddScoped<ITeslaCarAccessoryRepository, TeslaCarAccessoryReposi
 // 91. �������� ����������� HttpContexntAccessor
 builder.Services.AddHttpContextAccessor();
 
+// 115.1 Внедряим конфигурацию сервиса инициализации базы данных
+//builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
@@ -76,6 +78,9 @@ app.UseAuthorization();
 
 // 94.2 Конфигурируем систему Identity
 app.MapRazorPages();
+
+// 115.2 Внедряем Middleware для запуска класса инициализации
+//app.UseDbInitializer();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");

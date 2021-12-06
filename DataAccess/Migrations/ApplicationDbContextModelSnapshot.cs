@@ -34,7 +34,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("CarId");
 
-                    b.ToTable("CarAccessoryTeslaCar", (string)null);
+                    b.ToTable("CarAccessoryTeslaCar");
                 });
 
             modelBuilder.Entity("DataAccess.Data.CarAccessory", b =>
@@ -46,11 +46,9 @@ namespace DataAccess.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
@@ -75,7 +73,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CarAccessories", (string)null);
+                    b.ToTable("CarAccessories");
                 });
 
             modelBuilder.Entity("DataAccess.Data.TeslaCar", b =>
@@ -119,7 +117,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TeslaCars", (string)null);
+                    b.ToTable("TeslaCars");
                 });
 
             modelBuilder.Entity("DataAccess.Data.TeslaCarImage", b =>
@@ -140,7 +138,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("CarId");
 
-                    b.ToTable("TeslaCarImages", (string)null);
+                    b.ToTable("TeslaCarImages");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
