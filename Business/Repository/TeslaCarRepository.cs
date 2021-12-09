@@ -175,9 +175,6 @@ namespace Business.Repository
 					car.UpdatedBy = "";
 					car.UpdatedDate = DateTime.UtcNow;
 
-					
-					
-
 					// Обновляем данные в сущностях Entity
 					var updatedCar = _db.Update(car);
 

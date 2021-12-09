@@ -22,6 +22,10 @@
 @inject ITeslaCarAccessoryRepository _acc
 @inject NavigationManager _navManager
 
+@*108.1 Комментируем атрибут Authorize*@
+@*106. Добавляем атрибут доступа только для авторизованных пользователей*@
+@*@attribute [Authorize]*@
+
 <div class="row mt-2 mb-5">
     <h3 class="card-title text-info mb-3 ml-3">@title Car</h3>
     <div class="col-12">
@@ -170,7 +174,7 @@
     [Parameter] public int? Id { get; set; }
 
     [Parameter] public EventCallback OnUpdateListHandler {  get; set; }
- 
+
 
     // 29.3 Добавляем модель данных DTO, добавив ссылку на проект Models
     // Модели будут использоваться во всём проекте, поэтому добавляем using глобально
@@ -191,11 +195,24 @@
 
     List<CarAccessoryDTO> accessories;
 
+    // 108.2 Создаём каскадный параметр
+    [CascadingParameter] public Task<AuthenticationState> AuthenticationState {  get;  set; }
+
     // 46.1 Создаём метод инициализации значений компонента
     // И последующей проверки, создаём мы или редактируем машину
     protected override async Task OnInitializedAsync()
     {
         // Далее, перед реализацией, добавляем ещё один маршрут для редактирования
+
+         // 109. Реализовываем логику проверки авторизации пользователя
+            var authState = await AuthenticationState;
+            //if (!authState.User.Identity.IsAuthenticated)
+            if (!authState.User.IsInRole(Common.SD.ADMIN_ROLE))
+            {
+                // 110. Добавить получение и отправку текущего url
+                var url = new Uri(_navManager.Uri);
+                _navManager.NavigateTo($"/identity/account/login?returnUrl={url.LocalPath}");
+            }
 
         // 46.4 Реализовываем проверку, создаём или редактируем
         if (Id is not null)
@@ -468,6 +485,7 @@
             {
                 // Получаем обьъект для добавления
                 var accessory = await _acc.GetSingleAccessoryAsync(accId);
+                //accessory.Car.Add(carModel);
 
                 carModel.CarAccessories.Add(accessory);
 

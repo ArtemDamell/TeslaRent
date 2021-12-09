@@ -1,12 +1,29 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-    </Found>
-    <NotFound>
-        <PageTitle>Not found</PageTitle>
-        <LayoutView Layout="@typeof(MainLayout)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
-        </LayoutView>
-    </NotFound>
-</Router>
+﻿@*102. Добавляем каскадный параметер*@
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            @*107. Применить компонент для авторизационных атрибутов*@
+            @*107.1 Если мы хотим поменять текст для не авторизованных пользователей, то делаем расширенные настройки
+                            Оригинал закомментирован!
+            *@
+            @*<AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />*@
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" >
+                <NotAuthorized>
+                    @*107.2 Сюда можно поместить любой текст или компонент*@
+                    <div class="row alert alert-danger text-center">
+                        <div class="col">
+                            <b>Sorry, you do not have access to this page!</b>
+                        </div>
+                    </div>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

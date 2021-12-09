@@ -1,0 +1,74 @@
+﻿@*123.1 Создаём маршрут к компоненту*@
+@page "/user-list"
+@using Microsoft.AspNetCore.Identity
+
+@inject IUserRepository _userManager
+
+@*@attribute [Authorize(Roles = Common.SD.ADMIN_ROLE)]*@
+
+@*123.2 Создаём разметку компонента*@
+<div class="row mt-4">
+	<div class="col">
+		<h1 class="card-title text-info">All User's</h1>
+	</div>
+</div>
+
+@*123.3 Создаём таблицу вывода пользователей*@
+<div class="row mt-3">
+	<div class="col">
+		<table class="table table-striped table-hover">
+			<thead class="bg-info">
+				<tr>
+					<th>User ID</th>
+					<th>User Name</th>
+					<th>Ban expired</th>
+					<th>Access filed count</th>
+					<th>Role Name</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				@if (userList is not null && userList.Any())
+				{
+					@foreach (var item in userList)
+				   {
+					   <tr>
+						   <td>@item.Id</td>
+						   <td>@item.UserName</td>
+						   <td>@item.LockoutEnd</td>
+						   <td>@item.AccessFailedCount</td>
+						   <td>
+							 role
+						   </td>
+						   <td>
+							   @*47. Реализовываем кнопку редактирования машины*@
+							   <NavLink class="btn btn-primary" href="@($"user-list/edit/{item.Id}")">Edit</NavLink>
+							   @*77.1 / 77.3  Добавляем кнпку удаления машины из листа*@
+							   @*<button class="btn btn-danger" @onclick="(() =>DeletingHandler(item))">Delete</button>*@
+						   </td>
+					   </tr>
+				   }
+				}
+				else
+				{
+					<tr>
+						<td colspan="5">
+							<label>No cars found ...</label>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+@code {
+	IEnumerable<IdentityUser> userList;
+
+	protected override async Task OnInitializedAsync()
+	{
+		userList = await _userManager.GetAllUsersAsync();
+	}
+
+	
+}

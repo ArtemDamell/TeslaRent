@@ -1,8 +1,8 @@
-﻿@inject ITeslaCarAccessoryRepository _db
+﻿@inject IUserRepository _db
 @inject IJSRuntime _js
 
 @*106. Добавляем атрибут доступа только для авторизованных пользователей*@
-@attribute [Authorize]
+@*@attribute [Authorize]*@
 
 @if (OnShowCloseModal)
 {
@@ -56,7 +56,7 @@
 
 @code {
     [Parameter] public bool OnShowCloseModal { get; set; }
-    [Parameter] public CarAccessoryDTO OnAccessory { get; set; }
+    [Parameter] public IdentityUser OnUser { get; set; }
 
     [Parameter] public EventCallback<bool> OnShowCloseHandler { get; set; }
 
