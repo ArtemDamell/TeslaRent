@@ -31,6 +31,6 @@ namespace DataAccess.Data
         public virtual ICollection<TeslaCarImage>? TeslaCarImages { get; set; }
 
         // 86. Домашнее задание
-        public virtual ICollection<CarAccessory>? CarAccessories { get; set; }
+        public ICollection<CarAccessory>? CarAccessories { get; set; }
     }
 }

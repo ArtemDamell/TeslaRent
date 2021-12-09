@@ -7,7 +7,7 @@ namespace Business.Repository.IRepository
     {
         // 18.1 Добавить ссылку на проект Models
         public Task<TeslaCarDTO> CreateCar(TeslaCarDTO carForCreation);
-        public Task<TeslaCarDTO> UpdateCar(int carId, TeslaCarDTO carForUpdating, List<CarAccessoryDTO> accessoriesForAdding);
+        public Task<TeslaCarDTO> UpdateCar(int carId, TeslaCarDTO carForUpdating);
         public Task<int> DeleteCar(int carId);
         public Task<TeslaCarDTO> GetCar(int carId);
         public Task<IEnumerable<TeslaCarDTO>> GetAllCars();

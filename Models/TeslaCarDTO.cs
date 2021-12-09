@@ -22,6 +22,6 @@ namespace Models
         public List<string> ImageUrls { get; set; }
 
         // 86. Домашнее задание
-        public virtual ICollection<CarAccessoryDTO>? CarAccessories { get; set; }
+        public ICollection<CarAccessoryDTO>? CarAccessories { get; set; } = new List<CarAccessoryDTO>();
     }
 }

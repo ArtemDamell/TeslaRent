@@ -190,7 +190,6 @@
     public BlazoredTextEditor QuillHtml = new();
 
     List<CarAccessoryDTO> accessories;
-    List<CarAccessoryDTO> accessoriesForAdding = new();
 
     // 46.1 Создаём метод инициализации значений компонента
     // И последующей проверки, создаём мы или редактируем машину
@@ -204,6 +203,7 @@
             // Updating
             title = "Update";
             carModel = await _db.GetCar(Id.Value);
+            
 
             var tempAccessories = await _acc.GetAllAccessoriesAsync();
             accessories = tempAccessories.ToList();
@@ -275,7 +275,7 @@
                 // 84.4 При создании получаем данные из визуального редактора
                 carModel.Details = await QuillHtml.GetHTML();
 
-                var updateCarResult = await _db.UpdateCar(carModel.Id, carModel, accessoriesForAdding);
+                var updateCarResult = await _db.UpdateCar(carModel.Id, carModel);
                 if (updateCarResult is not null)
                 {
                     // 68. Обновление картинок при редактировании машины
@@ -468,7 +468,6 @@
             {
                 // Получаем обьъект для добавления
                 var accessory = await _acc.GetSingleAccessoryAsync(accId);
-                accessory.Car.Add(carModel);
 
                 carModel.CarAccessories.Add(accessory);
 

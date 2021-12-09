@@ -24,31 +24,51 @@ namespace Business.Repository
 
 		public async Task<TeslaCarDTO> CreateCar(TeslaCarDTO carForCreation)
 		{
-			// 24.1 Конвертируем с помощью AutoMapper модель DTO в обычную
-			TeslaCar car = _mapper.Map<TeslaCarDTO, TeslaCar>(carForCreation);
+			try
+			{
+				// 24.1 Конвертируем с помощью AutoMapper модель DTO в обычную
+				TeslaCar car = _mapper.Map<TeslaCarDTO, TeslaCar>(carForCreation);
 
-			// 24.2 Добавляем в модель недостающие данные
-			car.CreatedDate = DateTime.UtcNow;
-			car.CreatedBy = "";
+				var temp = car.CarAccessories.ToList();
+				car.CarAccessories.Clear();
+
+				// 24.2 Добавляем в модель недостающие данные
+				car.CreatedDate = DateTime.UtcNow;
+				car.CreatedBy = "";
 
 
-			// 19.2
-			/*
-			 * Добавляем реализацию метода, которая приведёт к ошибки
-			 * т.к. мы пытаемся сохранить через модель объект DTO
-			 * Для того, чтобы исправить эту проблему, мы будем использовать
-			 * библиотеку AutoMapper
-			*/
-			//var addedCar = _db.TeslaCars.Add(carForCreation);
-			// --> На этом этапе идём реализовывать функционал AutoMapper Profile
+				// 19.2
+				/*
+				 * Добавляем реализацию метода, которая приведёт к ошибки
+				 * т.к. мы пытаемся сохранить через модель объект DTO
+				 * Для того, чтобы исправить эту проблему, мы будем использовать
+				 * библиотеку AutoMapper
+				*/
+				//var addedCar = _db.TeslaCars.Add(carForCreation);
+				// --> На этом этапе идём реализовывать функционал AutoMapper Profile
 
-			// 24.3 Добавляем объект в сущности Entity
-			var addedCar = await _db.TeslaCars.AddAsync(car);
+				// 24.3 Добавляем объект в сущности Entity
+				var addedCar = _db.TeslaCars.Add(car);
 
-			// 24.4 Сохраняем на основе добавленых сущьностей изменения в базе данных
-			await _db.SaveChangesAsync();
+				// 24.4 Сохраняем на основе добавленых сущьностей изменения в базе данных
+				await _db.SaveChangesAsync();
 
-			return _mapper.Map<TeslaCar, TeslaCarDTO>(addedCar.Entity);
+				temp.ForEach(x =>
+				{
+					car.CarAccessories.Add(x);
+				});
+
+				_db.TeslaCars.Update(car);
+				await _db.SaveChangesAsync();
+
+				return _mapper.Map<TeslaCar, TeslaCarDTO>(addedCar.Entity);
+			}
+			catch (Exception ex)
+            {
+				throw ex;
+            }
+
+			
 			// --> Далее, реализовываем остальные методы
 		}
 
@@ -140,7 +160,7 @@ namespace Business.Repository
 			}
 		}
 
-		public async Task<TeslaCarDTO> UpdateCar(int carId, TeslaCarDTO carForUpdating, List<CarAccessoryDTO> accessoriesForAdding)
+		public async Task<TeslaCarDTO> UpdateCar(int carId, TeslaCarDTO carForUpdating)
 		{
 			try
 			{
@@ -150,7 +170,6 @@ namespace Business.Repository
 					var carDetailsFromDb = await _db.TeslaCars.FirstOrDefaultAsync(x => x.Id == carId);
 					// Конвертируем полученные данные из DTO в обычную модель для сохранения в базе
 					var car = _mapper.Map<TeslaCarDTO, TeslaCar>(carForUpdating, carDetailsFromDb);
-					var acessories = _mapper.Map<List<CarAccessoryDTO>, List<CarAccessory>>(accessoriesForAdding);
 
 					// Добавляем недостающие свойства
 					car.UpdatedBy = "";

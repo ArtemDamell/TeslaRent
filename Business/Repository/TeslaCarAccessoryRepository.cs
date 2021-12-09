@@ -63,7 +63,7 @@ namespace Business.Repository
         {
             try
             {
-                var acc = await _db.CarAccessories.ToListAsync();
+                var acc = await _db.CarAccessories.AsNoTracking().ToListAsync();
                 var allAccessories = _mapper.Map<IEnumerable<CarAccessory>, IEnumerable< CarAccessoryDTO>>(acc);
                 return allAccessories;
             }
