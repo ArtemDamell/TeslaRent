@@ -45,6 +45,8 @@ builder.Services.AddScoped<ITeslaCarImageRepository, TeslaCarImageRepository>();
 // 86. ���������������
 builder.Services.AddScoped<ITeslaCarAccessoryRepository, TeslaCarAccessoryRepository>();
 
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 // 91. �������� ����������� HttpContexntAccessor
 builder.Services.AddHttpContextAccessor();
 
