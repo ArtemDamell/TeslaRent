@@ -6,13 +6,15 @@ namespace Business.Repository.IRepository
     public interface ITeslaCarRepository
     {
         // 18.1 Добавить ссылку на проект Models
-        public Task<TeslaCarDTO> CreateCar(TeslaCarDTO carForCreation);
-        public Task<TeslaCarDTO> UpdateCar(int carId, TeslaCarDTO carForUpdating);
-        public Task<int> DeleteCar(int carId);
-        public Task<TeslaCarDTO> GetCar(int carId);
-        public Task<IEnumerable<TeslaCarDTO>> GetAllCars();
+        Task<TeslaCarDTO> CreateCar(TeslaCarDTO carForCreation);
+        Task<TeslaCarDTO> UpdateCar(int carId, TeslaCarDTO carForUpdating);
+        Task<int> DeleteCar(int carId);
+        Task<TeslaCarDTO> GetCar(int carId);
+        Task<IEnumerable<TeslaCarDTO>> GetAllCars();
 
         // 49.1 Добавляем параметр int carId = 0
-        public Task<TeslaCarDTO> IsCarUnique(string carName, int carId = 0);
+        Task<TeslaCarDTO> IsCarUnique(string carName, int carId = 0);
+        Task<IEnumerable<CarAccessoryDTO>> GetAllCarAccessories();
+        Task<CarAccessoryDTO> GetSingleAccessory(int id);
     }
 }

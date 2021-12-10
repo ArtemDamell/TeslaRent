@@ -194,5 +194,17 @@ namespace Business.Repository
 				return null;
 			}
 		}
+
+		public async Task<IEnumerable<CarAccessoryDTO>> GetAllCarAccessories()
+        {
+			var allAccessories = _mapper.Map<IEnumerable<CarAccessory>, IEnumerable<CarAccessoryDTO>>(await _db.CarAccessories.ToListAsync());
+			return allAccessories;
+        }
+
+		public async Task<CarAccessoryDTO> GetSingleAccessory(int id)
+        {
+			var accessory = _mapper.Map<CarAccessory, CarAccessoryDTO>(await _db.CarAccessories.FindAsync(id));
+			return accessory;
+        }
 	}
 }

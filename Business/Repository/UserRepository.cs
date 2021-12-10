@@ -18,9 +18,13 @@ namespace Business.Repository
             _userManager = userManager;
         }
 
-        public Task DeleteUserAsync(IdentityUser user)
+        public async Task<bool> DeleteUserAsync(IdentityUser user)
         {
-            throw new NotImplementedException();
+            var result = await _userManager.DeleteAsync(user);
+
+            if (result.Succeeded)
+                return true;
+            return false;
         }
 
         public async Task<IEnumerable<IdentityUser>> GetAllUsersAsync()

@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Identity
 
 @inject IUserRepository _userManager
+@inject IJSRuntime _js
 
 @*@attribute [Authorize(Roles = Common.SD.ADMIN_ROLE)]*@
 
@@ -28,7 +29,15 @@
 				</tr>
 			</thead>
 			<tbody>
-				@if (userList is not null && userList.Any())
+				@if (userList is null)
+				{
+					<tr>
+						<td colspan="5">
+							<label>Loading users ...</label>
+						</td>
+					</tr>
+				}
+				else if (userList.Any())
 				{
 					@foreach (var item in userList)
 				   {
@@ -41,10 +50,8 @@
 							 role
 						   </td>
 						   <td>
-							   @*47. Реализовываем кнопку редактирования машины*@
-							   <NavLink class="btn btn-primary" href="@($"user-list/edit/{item.Id}")">Edit</NavLink>
-							   @*77.1 / 77.3  Добавляем кнпку удаления машины из листа*@
-							   @*<button class="btn btn-danger" @onclick="(() =>DeletingHandler(item))">Delete</button>*@
+							   <button type="button" class="btn btn-primary" @onclick="(() =>EditHandler(item))">Edit</button>
+							   <button type="button" class="btn btn-danger" @onclick="(() =>DeletingHandler(item))">Delete</button>
 						   </td>
 					   </tr>
 				   }
@@ -52,8 +59,8 @@
 				else
 				{
 					<tr>
-						<td colspan="5">
-							<label>No cars found ...</label>
+						<td colspan="6">
+							<label>No users found ...</label>
 						</td>
 					</tr>
 				}
@@ -62,13 +69,46 @@
 	</div>
 </div>
 
+<UpdateUser OnShowCloseHandler="OnShowCloseHandler" OnShowCloseModal="ShowCloseModal" OnUser="userForUpdating" />
+
 @code {
 	IEnumerable<IdentityUser> userList;
+	IdentityUser userForUpdating;
+	bool ShowCloseModal = false;
 
 	protected override async Task OnInitializedAsync()
 	{
 		userList = await _userManager.GetAllUsersAsync();
 	}
 
-	
+	async Task DeletingHandler(IdentityUser user)
+	{
+		var result = await _userManager.DeleteUserAsync(user);
+
+		if (result)
+		{
+			await _js.ToastrSuccess($"{user.UserName} deleting successful!");
+			userList = await _userManager.GetAllUsersAsync();
+		}
+		else
+			await _js.ToastrError($"Shit is happen... Not deleted!");
+	}
+
+	void EditHandler(IdentityUser user)
+	{
+		userForUpdating = user;
+		OnShowCloseHandler();
+
+	}
+
+	async Task OnShowCloseHandler()
+	{
+		if(ShowCloseModal)
+		{
+			ShowCloseModal = !ShowCloseModal;
+			userList = await _userManager.GetAllUsersAsync();
+		}
+		else
+			ShowCloseModal = !ShowCloseModal;
+	}
 }

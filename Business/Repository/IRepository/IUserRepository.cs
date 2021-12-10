@@ -12,6 +12,6 @@ namespace Business.Repository.IRepository
 		Task<IEnumerable<IdentityUser>> GetAllUsersAsync();
 		Task<IdentityUser> GetSingleUserAsync(string userId);
 		Task<bool> UpdateUserAsync(IdentityUser user);
-		Task DeleteUserAsync(IdentityUser user);
+		Task<bool> DeleteUserAsync(IdentityUser user);
 	}
 }

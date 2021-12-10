@@ -19,7 +19,7 @@
 @inject ITeslaCarImageRepository _imageRepository
 @*************************************************************@
 @using System.Linq
-@inject ITeslaCarAccessoryRepository _acc
+@*@inject ITeslaCarAccessoryRepository _acc*@
 @inject NavigationManager _navManager
 
 @*108.1 Комментируем атрибут Authorize*@
@@ -222,7 +222,7 @@
             carModel = await _db.GetCar(Id.Value);
             
 
-            var tempAccessories = await _acc.GetAllAccessoriesAsync();
+            var tempAccessories = await _db.GetAllCarAccessories();
             accessories = tempAccessories.ToList();
 
             // Updating accessories
@@ -242,7 +242,7 @@
         {
             // Creating
             carModel = new();
-            var tempAccessories = await _acc.GetAllAccessoriesAsync();
+            var tempAccessories = await _db.GetAllCarAccessories();
             accessories = tempAccessories.ToList();
         }
         // После этого, идём в компонент листа и реализовываем кнопку редактирования
@@ -484,8 +484,7 @@
             if (carModel.CarAccessories.FirstOrDefault(x => x.Id == accId) == null)
             {
                 // Получаем обьъект для добавления
-                var accessory = await _acc.GetSingleAccessoryAsync(accId);
-                //accessory.Car.Add(carModel);
+                var accessory = await _db.GetSingleAccessory(accId);
 
                 carModel.CarAccessories.Add(accessory);
 
