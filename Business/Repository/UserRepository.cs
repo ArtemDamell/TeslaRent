@@ -12,10 +12,12 @@ namespace Business.Repository
     public class UserRepository : IUserRepository
     {
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UserRepository(UserManager<IdentityUser> userManager)
+        public UserRepository(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public async Task<bool> DeleteUserAsync(IdentityUser user)
@@ -47,6 +49,40 @@ namespace Business.Repository
                 return true;
             else
                 return false;
+        }
+
+        public async Task<IdentityRole?> GetCurrentUserRoleAsync(IdentityUser currentUser)
+        {
+            var currentRoleNames = await _userManager.GetRolesAsync(currentUser);
+            var name = currentRoleNames.FirstOrDefault();
+
+            if (!string.IsNullOrWhiteSpace(name))
+                return await _roleManager.FindByNameAsync(name);
+
+            return null;
+        }
+
+        public async Task<bool> UpdateUserRole(IdentityUser user, IdentityRole newRole)
+        {
+            if (!string.IsNullOrWhiteSpace(newRole.Id))
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                _ = _userManager.RemoveFromRolesAsync(user, roles);
+                var result = _userManager.AddToRoleAsync(user, newRole.Name);
+
+                if (result.Result.Succeeded)
+                    return true;
+                return false;
+            }
+            else
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                var result = _userManager.RemoveFromRolesAsync(user, roles);
+
+                if (result.Result.Succeeded)
+                    return true;
+                return false;
+            }
         }
     }
 }

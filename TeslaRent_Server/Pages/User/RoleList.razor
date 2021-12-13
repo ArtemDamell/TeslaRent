@@ -1,0 +1,72 @@
+﻿@page "/role-list"
+
+@using Microsoft.AspNetCore.Identity
+
+@inject IRoleRepository _roleManager
+@inject IJSRuntime _js
+
+@*@attribute [Authorize(Roles = Common.SD.ADMIN_ROLE)]*@
+
+<div class="row mt-4">
+	<div class="col-8">
+		<h1 class="card-title text-info">All Role's</h1>
+	</div>
+	<div class="col-3 offset-1">
+		<button type="button" class="btn btn-success">Add New Role</button>
+	</div>
+</div>
+
+<div class="row mt-3">
+	<div class="col">
+		<table class="table table-striped table-hover">
+			<thead class="bg-info">
+				<tr>
+					<th>Role ID</th>
+					<th>Role Name</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				@if (roleList is null)
+				{
+					<tr>
+						<td colspan="5">
+							<label>Loading roles ...</label>
+						</td>
+					</tr>
+				}
+				else if (roleList.Any())
+				{
+					@foreach (var item in roleList)
+				   {
+					   <tr>
+						   <td>@item.Id</td>
+						   <td>@item.Name</td>
+						   <td>
+							   @*<button type="button" class="btn btn-primary" @onclick="(() =>EditHandler(item))">Edit</button>
+							   <button type="button" class="btn btn-danger" @onclick="(() =>DeletingHandler(item))">Delete</button>*@
+						   </td>
+					   </tr>
+				   }
+				}
+				else
+				{
+					<tr>
+						<td colspan="6">
+							<label>No roles found ...</label>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+@code {
+	IEnumerable<IdentityRole> roleList;
+
+	protected override async Task OnInitializedAsync()
+	{
+		roleList = await _roleManager.GetAllRolesAsync();
+	}
+}

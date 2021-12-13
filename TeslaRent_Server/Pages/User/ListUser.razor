@@ -3,112 +3,168 @@
 @using Microsoft.AspNetCore.Identity
 
 @inject IUserRepository _userManager
+@inject IRoleRepository _roleManager
 @inject IJSRuntime _js
 
 @*@attribute [Authorize(Roles = Common.SD.ADMIN_ROLE)]*@
 
 @*123.2 Создаём разметку компонента*@
 <div class="row mt-4">
-	<div class="col">
-		<h1 class="card-title text-info">All User's</h1>
-	</div>
+    <div class="col">
+        <h1 class="card-title text-info">All User's</h1>
+    </div>
 </div>
 
 @*123.3 Создаём таблицу вывода пользователей*@
 <div class="row mt-3">
-	<div class="col">
-		<table class="table table-striped table-hover">
-			<thead class="bg-info">
-				<tr>
-					<th>User ID</th>
-					<th>User Name</th>
-					<th>Ban expired</th>
-					<th>Access filed count</th>
-					<th>Role Name</th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				@if (userList is null)
-				{
-					<tr>
-						<td colspan="5">
-							<label>Loading users ...</label>
-						</td>
-					</tr>
-				}
-				else if (userList.Any())
-				{
-					@foreach (var item in userList)
-				   {
-					   <tr>
-						   <td>@item.Id</td>
-						   <td>@item.UserName</td>
-						   <td>@item.LockoutEnd</td>
-						   <td>@item.AccessFailedCount</td>
-						   <td>
-							 role
-						   </td>
-						   <td>
-							   <button type="button" class="btn btn-primary" @onclick="(() =>EditHandler(item))">Edit</button>
-							   <button type="button" class="btn btn-danger" @onclick="(() =>DeletingHandler(item))">Delete</button>
-						   </td>
-					   </tr>
-				   }
-				}
-				else
-				{
-					<tr>
-						<td colspan="6">
-							<label>No users found ...</label>
-						</td>
-					</tr>
-				}
-			</tbody>
-		</table>
-	</div>
+    <div class="col">
+        <table class="table table-striped table-hover">
+            <thead class="bg-info">
+                <tr>
+                    <th>User ID</th>
+                    <th>User Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Ban expired</th>
+                    <th>Access filed count</th>
+                    <th>Role Name</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (userList is null)
+                {
+                    <tr>
+                        <td colspan="5">
+                            <label>Loading users ...</label>
+                        </td>
+                    </tr>
+                }
+                else if (userList.Any())
+                {
+                    @foreach (var item in userList)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            <td>@item.UserName</td>
+                            <td>@item.Email</td>
+                            <td>@item.PhoneNumber</td>
+                            <td>@item.LockoutEnd</td>
+                            <td>@item.AccessFailedCount</td>
+                            <td>
+                                role
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-primary" @onclick="(() =>EditHandler(item))">Edit</button>
+                                <button type="button" class="btn btn-danger" @onclick="(() =>DeletingHandler(item))">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6">
+                            <label>No users found ...</label>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<UpdateUser OnShowCloseHandler="OnShowCloseHandler" OnShowCloseModal="ShowCloseModal" OnUser="userForUpdating" />
+<UpdateUser OnShowCloseHandler="OnShowCloseHandler" OnShowCloseModal="ShowCloseModal" OnUser="userForUpdating" OnCurrentRole="currentUserRole" OnRoleList="roleList" OnValidSubmitHandler="((args) => ValidSubmitHandler(args.Item1, args.Item2))" />
 
 @code {
-	IEnumerable<IdentityUser> userList;
-	IdentityUser userForUpdating;
-	bool ShowCloseModal = false;
+    IEnumerable<IdentityUser> userList;
+    IEnumerable<IdentityRole> roleList;
 
-	protected override async Task OnInitializedAsync()
-	{
-		userList = await _userManager.GetAllUsersAsync();
-	}
+    IdentityUser userForUpdating;
+    IdentityRole currentUserRole;
+    bool ShowCloseModal = false;
 
-	async Task DeletingHandler(IdentityUser user)
-	{
-		var result = await _userManager.DeleteUserAsync(user);
+    protected override async Task OnInitializedAsync()
+    {
+        userList = await _userManager.GetAllUsersAsync();
+        roleList = await _roleManager.GetAllRolesAsync();
+    }
 
-		if (result)
-		{
-			await _js.ToastrSuccess($"{user.UserName} deleting successful!");
-			userList = await _userManager.GetAllUsersAsync();
-		}
-		else
-			await _js.ToastrError($"Shit is happen... Not deleted!");
-	}
+    async Task DeletingHandler(IdentityUser user)
+    {
+        var result = await _userManager.DeleteUserAsync(user);
 
-	void EditHandler(IdentityUser user)
-	{
-		userForUpdating = user;
-		OnShowCloseHandler();
+        if (result)
+        {
+            await _js.ToastrSuccess($"{user.UserName} deleting successful!");
+            userList = await _userManager.GetAllUsersAsync();
+        }
+        else
+            await _js.ToastrError($"Shit is happen... Not deleted!");
+    }
 
-	}
+    void EditHandler(IdentityUser user)
+    {
+        userForUpdating = user;
+        currentUserRole = new();
 
-	async Task OnShowCloseHandler()
-	{
-		if(ShowCloseModal)
-		{
-			ShowCloseModal = !ShowCloseModal;
-			userList = await _userManager.GetAllUsersAsync();
-		}
-		else
-			ShowCloseModal = !ShowCloseModal;
-	}
+        Task.Run(async () =>
+        {
+            currentUserRole = await _userManager.GetCurrentUserRoleAsync(user);
+        });
+
+        OnShowCloseHandler();
+    }
+
+    void OnShowCloseHandler()
+    {
+        if (ShowCloseModal)
+        {
+            ShowCloseModal = !ShowCloseModal;
+            Task.Run(async () =>
+            {
+                userList = await _userManager.GetAllUsersAsync();
+            });
+        }
+        else
+            ShowCloseModal = !ShowCloseModal;
+    }
+
+    async Task ValidSubmitHandler(IdentityUser updatedUser, IdentityRole updatedRole)
+    {
+        bool result = false;
+
+        userForUpdating = updatedUser;
+        currentUserRole = updatedRole;
+
+        userForUpdating.NormalizedEmail = updatedUser.Email.Normalize();
+
+        if (userForUpdating is not null)
+        {
+            if (currentUserRole is not null && currentUserRole.Name is not null)
+            {
+                var roleUpdateResult = await _userManager.UpdateUserRole(userForUpdating, currentUserRole);
+
+                if (roleUpdateResult)
+                    await _js.ToastrSuccess($"{userForUpdating.UserName} role updating: {currentUserRole.Name} successful!");
+                else
+                    await _js.ToastrError($"User role is not updated!");
+            }
+
+            result = await _userManager.UpdateUserAsync(userForUpdating);
+        }
+        else
+        {
+            await _js.ToastrError($"User is null");
+            return;
+        }
+
+        if (result)
+        {
+            await _js.ToastrSuccess($"{userForUpdating.UserName} Updating successful!");
+            OnShowCloseHandler();
+        }
+        else
+            await _js.ToastrError($"Shit is happen...");
+    }
 }

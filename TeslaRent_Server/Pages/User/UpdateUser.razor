@@ -1,11 +1,9 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@inject IUserRepository _db
-@inject IJSRuntime _js
 
 @*106. Добавляем атрибут доступа только для авторизованных пользователей*@
 @*@attribute [Authorize]*@
 
-@if (OnShowCloseModal)
+@if (OnShowCloseModal && OnUser is not null)
 {
     <div class="modal show fade" data-backdrop="static" data-keyboard="false" id="deleteConfModal" tabindex="-1" role="dialog" style="display: block;">
         <div class="modal-dialog modal-modal-dialog-centered" role="document">
@@ -23,8 +21,11 @@
                         <div class="row">
                             <div class="col">
                                 <DataAnnotationsValidator />
-                                <div class="mb-3">
-                                    <label class="text-left">Id: @OnUser.Id</label>
+                               <div class="form-group mb-3">
+                                    <label>User ID</label>
+                                    <div>
+                                        <InputText @bind-Value="OnUser.Id" class="form-control" disabled />
+                                    </div>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label>User Name</label>
@@ -33,17 +34,31 @@
                                         <ValidationMessage For="() => OnUser.UserName" />
                                     </div>
                                 </div>
+
+                                <div class="form-group mb-3">
+                                    <label>Current Role</label>
+                                    <div>
+                                        <input value="@(!string.IsNullOrWhiteSpace(OnCurrentRole.Name) ? OnCurrentRole.Name : "-- NO ROLE --" )" class="form-control" disabled />
+                                    </div>
+                                </div>
+                                 <div class="form-group mb-3">
+                                    <label>Roles</label>
+                                    <div>
+                                        <InputSelect @bind-Value="@OnCurrentRole" class="form-control form-select">
+                                            <option value="">Select role</option>
+                                            @foreach (var role in OnRoleList)
+                                            {
+                                                <option value="@role.Id" selected="@((OnCurrentRole.Id == role.Id) ? "selected" : "")">@role.Name</option>
+                                            }
+                                    </InputSelect>
+                                    </div>
+                                </div>
+
                                 <div class="form-group mb-3">
                                     <label>User Email</label>
                                     <div>
                                         <InputText @bind-Value="OnUser.Email" class="form-control" placeholder="Enter user email ..." />
                                         <ValidationMessage For="() => OnUser.Email" />
-                                    </div>
-                                </div>
-                                <div class="mb-3 border rounded p-1">
-                                    <div class="form-check form-switch">
-                                        <input @bind-value="OnUser.EmailConfirmed" class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" checked="@((OnUser.EmailConfirmed) ? true : false)" />
-                                        <label class="form-check-label" style="float: left" for="flexSwitchCheckDefault">Email is confirmed?</label>
                                     </div>
                                 </div>
                                 <div class="form-group mb-3">
@@ -62,6 +77,12 @@
                                     <div class="form-check form-switch">
                                         <input @bind-value="OnUser.PhoneNumberConfirmed" class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" checked="@((OnUser.PhoneNumberConfirmed) ? true : false)" />
                                         <label class="form-check-label" style="float: left" for="flexSwitchCheckDefault">Phone is confirmed?</label>
+                                    </div>
+                                </div>
+                                <div class="mb-3 border rounded p-1">
+                                    <div class="form-check form-switch">
+                                        <input @bind-value="OnUser.EmailConfirmed" class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" checked="@((OnUser.EmailConfirmed) ? true : false)" />
+                                        <label class="form-check-label" style="float: left" for="flexSwitchCheckDefault">Email is confirmed?</label>
                                     </div>
                                 </div>
                             </div>
@@ -83,30 +104,19 @@
 
 @code {
     [Parameter] public bool OnShowCloseModal { get; set; }
-    [Parameter] public IdentityUser? OnUser { get; set; }
+
+    [Parameter] public IdentityUser OnUser { get; set; }
+    [Parameter] public IdentityRole OnCurrentRole {  get;  set; }
+
+    [Parameter] public IEnumerable<IdentityRole> OnRoleList { get; set; }
 
     [Parameter] public EventCallback OnShowCloseHandler { get; set; }
+    [Parameter] public EventCallback<(IdentityUser, IdentityRole)> OnValidSubmitHandler { get; set; }
 
     string title = "Update";
 
     async Task SubmitHandler()
     {
-        bool result = false;
-
-        if (OnUser is not null)
-            result = await _db.UpdateUserAsync(OnUser);
-        else
-        {
-            await _js.ToastrError($"User is null");
-            return;
-        }
-
-        if (result)
-        {
-            await _js.ToastrSuccess($"{OnUser.UserName} Updating successful!");
-            await OnShowCloseHandler.InvokeAsync(true);
-        }
-        else
-            await _js.ToastrError($"Shit is happen...");
+         await OnValidSubmitHandler.InvokeAsync((OnUser, OnCurrentRole));
     }
 }
