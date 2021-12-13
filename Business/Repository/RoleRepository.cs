@@ -47,5 +47,18 @@ namespace Business.Repository
 
             return false;
         }
+
+        public async Task<bool> CreateNewRole(IdentityRole newRole)
+        {
+            if (newRole == null)
+                return false;
+
+            var result = await _roleManager.CreateAsync(newRole);
+
+            if (result.Succeeded)
+                return true;
+
+            return false;
+        }
     }
 }

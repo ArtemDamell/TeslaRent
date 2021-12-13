@@ -13,5 +13,6 @@ namespace Business.Repository.IRepository
 		Task<IdentityRole> GetSingleRoleAsync(string roleId);
 		Task<bool> UpdateRoleAsync(IdentityRole role);
 		Task<bool> DeleteRoleAsync(IdentityRole role);
+		Task<bool> CreateNewRole(IdentityRole newRole);
 	}
 }

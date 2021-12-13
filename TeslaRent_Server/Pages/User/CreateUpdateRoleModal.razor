@@ -1,0 +1,74 @@
+﻿@using Microsoft.AspNetCore.Identity
+
+@*@attribute [Authorize]*@
+
+@if (OnShowCloseModal)
+{
+    <div class="modal show fade" data-backdrop="static" data-keyboard="false" id="deleteConfModal" tabindex="-1" role="dialog" style="display: block;">
+        <div class="modal-dialog modal-modal-dialog-centered" role="document">
+            <EditForm Model="@OnCurrentRole" OnValidSubmit="ValidSubmit">
+                <div class="modal-content">
+
+                    <div class="modal-header bg-success">
+                        <h5 class="modal-title text-white" id="exModalLabel">@title Role</h5>
+                        <button type="button" class="btn-close bg-white" @onclick="OnShowCloseModalHandler" datadata-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body text-center">
+                        <div class="row">
+                            <div class="col">
+                                <DataAnnotationsValidator />
+                                <div class="form-group mb-3">
+                                    <label>Role ID</label>
+                                    <div>
+                                        <InputText @bind-Value="OnCurrentRole.Id" class="form-control" disabled />
+                                    </div>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label>Role Name</label>
+                                    <div>
+                                        <InputText @bind-Value="OnCurrentRole.Name" class="form-control" placeholder="Enter role name..." />
+                                        <ValidationMessage For="() => OnCurrentRole.Name" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-success" type="submit">
+                            @title role
+                        </button>
+                        <button class="btn btn-outline-secondary" type="button" @onclick="OnShowCloseModalHandler" data-dismiss="modal">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool OnShowCloseModal { get; set; }
+    [Parameter] public IdentityRole OnCurrentRole { get; set; }
+
+    [Parameter] public EventCallback OnShowCloseModalHandler { get; set; }
+    [Parameter] public EventCallback<IdentityRole> OnValidSubmitHandler { get; set; }
+
+    string title = "Create";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (OnCurrentRole is not null && OnCurrentRole.Name is not null)
+            title = "Update";
+        else
+            OnCurrentRole = new();
+    }
+
+    async Task ValidSubmit()
+    {
+        await OnValidSubmitHandler.InvokeAsync(OnCurrentRole);
+    }
+}
