@@ -67,10 +67,13 @@ namespace Business.Repository
             if (!string.IsNullOrWhiteSpace(newRole.Id))
             {
                 var roles = await _userManager.GetRolesAsync(user);
-                _ = _userManager.RemoveFromRolesAsync(user, roles);
-                var result = _userManager.AddToRoleAsync(user, newRole.Name);
 
-                if (result.Result.Succeeded)
+                if (roles.Any())
+                    _ = await _userManager.RemoveFromRolesAsync(user, roles);
+
+                var result = await _userManager.AddToRoleAsync(user, newRole.Name);
+
+                if (result.Succeeded)
                     return true;
                 return false;
             }

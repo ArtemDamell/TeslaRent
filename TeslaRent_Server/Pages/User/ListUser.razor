@@ -35,7 +35,7 @@
                 @if (userList is null)
                 {
                     <tr>
-                        <td colspan="5">
+                        <td colspan="8">
                             <label>Loading users ...</label>
                         </td>
                     </tr>
@@ -52,7 +52,21 @@
                             <td>@item.LockoutEnd</td>
                             <td>@item.AccessFailedCount</td>
                             <td>
-                                role
+                               @* @{
+                                    IdentityRole? currRole = new();
+                                    Task.Run(async () =>
+                                    {
+                                        currRole = await _userManager.GetCurrentUserRoleAsync(item);
+                                    });
+                                }
+                                @if (currRole is not null && currRole.Name is not null)
+                                {
+                                    <span>@currRole.Name</span>
+                                }
+                                else
+                                {
+                                    <span>-- NO ROLE --</span>
+                                }*@
                             </td>
                             <td>
                                 <button type="button" class="btn btn-primary" @onclick="(() =>EditHandler(item))">Edit</button>
@@ -64,7 +78,7 @@
                 else
                 {
                     <tr>
-                        <td colspan="6">
+                        <td colspan="8">
                             <label>No users found ...</label>
                         </td>
                     </tr>
@@ -74,7 +88,11 @@
     </div>
 </div>
 
-<UpdateUser OnShowCloseHandler="OnShowCloseHandler" OnShowCloseModal="ShowCloseModal" OnUser="userForUpdating" OnCurrentRole="currentUserRole" OnRoleList="roleList" OnValidSubmitHandler="((args) => ValidSubmitHandler(args.Item1, args.Item2))" />
+@if (ShowCloseModal)
+{
+    <UpdateUser OnShowCloseHandler="OnShowCloseHandler" OnUser="userForUpdating" OnCurrentRole="currentUserRole" OnRoleList="roleList" OnValidSubmitHandler="((args) => ValidSubmitHandler(args.Item1, args.Item2))" />
+}
+
 
 @code {
     IEnumerable<IdentityUser> userList;
@@ -103,39 +121,25 @@
             await _js.ToastrError($"Shit is happen... Not deleted!");
     }
 
-    void EditHandler(IdentityUser user)
+    async Task EditHandler(IdentityUser user)
     {
         userForUpdating = user;
-        currentUserRole = new();
-
-        Task.Run(async () =>
-        {
-            currentUserRole = await _userManager.GetCurrentUserRoleAsync(user);
-        });
+        currentUserRole = await _userManager.GetCurrentUserRoleAsync(user);
 
         OnShowCloseHandler();
     }
 
     void OnShowCloseHandler()
     {
-        if (ShowCloseModal)
-        {
-            ShowCloseModal = !ShowCloseModal;
-            Task.Run(async () =>
-            {
-                userList = await _userManager.GetAllUsersAsync();
-            });
-        }
-        else
-            ShowCloseModal = !ShowCloseModal;
+        ShowCloseModal = !ShowCloseModal;
     }
 
-    async Task ValidSubmitHandler(IdentityUser updatedUser, IdentityRole updatedRole)
+    async Task ValidSubmitHandler(IdentityUser updatedUser, string updatedRoleId)
     {
         bool result = false;
 
         userForUpdating = updatedUser;
-        currentUserRole = updatedRole;
+        currentUserRole = await _roleManager.GetSingleRoleAsync(updatedRoleId);
 
         userForUpdating.NormalizedEmail = updatedUser.Email.Normalize();
 
@@ -146,7 +150,11 @@
                 var roleUpdateResult = await _userManager.UpdateUserRole(userForUpdating, currentUserRole);
 
                 if (roleUpdateResult)
+                {
                     await _js.ToastrSuccess($"{userForUpdating.UserName} role updating: {currentUserRole.Name} successful!");
+                    userList = await _userManager.GetAllUsersAsync();
+                }
+
                 else
                     await _js.ToastrError($"User role is not updated!");
             }
@@ -163,6 +171,7 @@
         {
             await _js.ToastrSuccess($"{userForUpdating.UserName} Updating successful!");
             OnShowCloseHandler();
+            userList = await _userManager.GetAllUsersAsync();
         }
         else
             await _js.ToastrError($"Shit is happen...");

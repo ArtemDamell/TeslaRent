@@ -30,7 +30,7 @@
                 @if (roleList is null)
                 {
                     <tr>
-                        <td colspan="5">
+                        <td colspan="3">
                             <label>Loading roles ...</label>
                         </td>
                     </tr>
@@ -52,7 +52,7 @@
                 else
                 {
                     <tr>
-                        <td colspan="6">
+                        <td colspan="3">
                             <label>No roles found ...</label>
                         </td>
                     </tr>
@@ -62,7 +62,10 @@
     </div>
 </div>
 
-<CreateUpdateRoleModal OnShowCloseModal="ShowCloseModal" OnCurrentRole="roleObj" OnShowCloseModalHandler="OnShowCloseHandler" OnValidSubmitHandler="ValidSubmitHandler" />
+@if (ShowCloseModal)
+{
+    <CreateUpdateRoleModal OnCurrentRole="roleObj" OnShowCloseModalHandler="OnShowCloseHandler" OnValidSubmitHandler="ValidSubmitHandler" />
+}
 
 @code {
     IEnumerable<IdentityRole> roleList;
@@ -76,15 +79,6 @@
 
     void OnShowCloseHandler()
     {
-        if (ShowCloseModal)
-        {
-            ShowCloseModal = !ShowCloseModal;
-            Task.Run(async () =>
-            {
-                roleList = await _roleManager.GetAllRolesAsync();
-            });
-        }
-        else
             ShowCloseModal = !ShowCloseModal;
     }
 
@@ -105,7 +99,10 @@
         var result = await _roleManager.DeleteRoleAsync(role);
 
         if (result)
+        {
             await _js.ToastrSuccess($"Role deleting: {role.Name} successful!");
+            roleList = await _roleManager.GetAllRolesAsync();
+        }
         else
             await _js.ToastrError($"User role was not deleted!");
     }
@@ -122,9 +119,14 @@
                 var roleUpdateResult = await _roleManager.UpdateRoleAsync(roleObj);
 
                 if (roleUpdateResult)
+                {
                     await _js.ToastrSuccess($"Role updating: {roleObj.Name} successful!");
+                    roleList = await _roleManager.GetAllRolesAsync();
+                }
                 else
                     await _js.ToastrError($"User role is not updated!");
+
+                OnShowCloseHandler();
             }
         }
         else
@@ -132,9 +134,15 @@
             var result = await _roleManager.CreateNewRole(roleObj);
 
             if (result)
+            {
                 await _js.ToastrSuccess($"Role creating: {roleObj.Name} successful!");
+                roleList = await _roleManager.GetAllRolesAsync();
+            }
+            
             else
                 await _js.ToastrError($"User role is not created!");
+
+            OnShowCloseHandler();
         }
     }
 }

@@ -60,5 +60,10 @@ namespace Business.Repository
 
             return false;
         }
+
+        public async Task<IdentityRole> GetRoleByNameAsync(string roleName)
+        {
+            return await _roleManager.FindByNameAsync(roleName);
+        }
     }
 }

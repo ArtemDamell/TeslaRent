@@ -2,14 +2,12 @@
 
 @*@attribute [Authorize]*@
 
-@if (OnShowCloseModal)
-{
     <div class="modal show fade" data-backdrop="static" data-keyboard="false" id="deleteConfModal" tabindex="-1" role="dialog" style="display: block;">
         <div class="modal-dialog modal-modal-dialog-centered" role="document">
             <EditForm Model="@OnCurrentRole" OnValidSubmit="ValidSubmit">
                 <div class="modal-content">
 
-                    <div class="modal-header bg-success">
+                    <div class="modal-header @cssClass">
                         <h5 class="modal-title text-white" id="exModalLabel">@title Role</h5>
                         <button type="button" class="btn-close bg-white" @onclick="OnShowCloseModalHandler" datadata-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true"></span>
@@ -48,27 +46,25 @@
             </EditForm>
         </div>
     </div>
-}
 
 @code {
-    [Parameter] public bool OnShowCloseModal { get; set; }
     [Parameter] public IdentityRole OnCurrentRole { get; set; }
 
     [Parameter] public EventCallback OnShowCloseModalHandler { get; set; }
     [Parameter] public EventCallback<IdentityRole> OnValidSubmitHandler { get; set; }
 
     string title = "Create";
+    string cssClass = "bg-success";
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        if (OnCurrentRole is not null && OnCurrentRole.Name is not null)
+        if (OnCurrentRole?.Name is not null)
+        {
             title = "Update";
-        else
-            OnCurrentRole = new();
+            cssClass = "bg-info";
+        }
+        
     }
 
-    async Task ValidSubmit()
-    {
-        await OnValidSubmitHandler.InvokeAsync(OnCurrentRole);
-    }
+    async Task ValidSubmit() => await OnValidSubmitHandler.InvokeAsync(OnCurrentRole);
 }

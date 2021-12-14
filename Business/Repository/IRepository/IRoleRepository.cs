@@ -11,6 +11,7 @@ namespace Business.Repository.IRepository
     {
 		Task<IEnumerable<IdentityRole>> GetAllRolesAsync();
 		Task<IdentityRole> GetSingleRoleAsync(string roleId);
+		Task<IdentityRole> GetRoleByNameAsync(string roleName);
 		Task<bool> UpdateRoleAsync(IdentityRole role);
 		Task<bool> DeleteRoleAsync(IdentityRole role);
 		Task<bool> CreateNewRole(IdentityRole newRole);
