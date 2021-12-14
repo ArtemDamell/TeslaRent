@@ -1,5 +1,6 @@
 ﻿@*123.1 Создаём маршрут к компоненту*@
 @page "/user-list"
+@using DataAccess.Data
 @using Microsoft.AspNetCore.Identity
 
 @inject IUserRepository _userManager
@@ -32,7 +33,7 @@
                 </tr>
             </thead>
             <tbody>
-                @if (userList is null)
+                @if (usersWithRoles is null)
                 {
                     <tr>
                         <td colspan="8">
@@ -40,37 +41,23 @@
                         </td>
                     </tr>
                 }
-                else if (userList.Any())
+                else if (usersWithRoles.Any())
                 {
-                    @foreach (var item in userList)
+                    @foreach (var item in usersWithRoles)
                     {
                         <tr>
-                            <td>@item.Id</td>
-                            <td>@item.UserName</td>
-                            <td>@item.Email</td>
-                            <td>@item.PhoneNumber</td>
-                            <td>@item.LockoutEnd</td>
-                            <td>@item.AccessFailedCount</td>
+                            <td>@item.User.Id</td>
+                            <td>@item.User.UserName</td>
+                            <td>@item.User.Email</td>
+                            <td>@item.User.PhoneNumber</td>
+                            <td>@item.User.LockoutEnd</td>
+                            <td>@item.User.AccessFailedCount</td>
                             <td>
-                               @* @{
-                                    IdentityRole? currRole = new();
-                                    Task.Run(async () =>
-                                    {
-                                        currRole = await _userManager.GetCurrentUserRoleAsync(item);
-                                    });
-                                }
-                                @if (currRole is not null && currRole.Name is not null)
-                                {
-                                    <span>@currRole.Name</span>
-                                }
-                                else
-                                {
-                                    <span>-- NO ROLE --</span>
-                                }*@
+                                 @((!string.IsNullOrWhiteSpace(item.Role.Name)) ? item.Role.Name : "--- NO ROLE ---")
                             </td>
                             <td>
-                                <button type="button" class="btn btn-primary" @onclick="(() =>EditHandler(item))">Edit</button>
-                                <button type="button" class="btn btn-danger" @onclick="(() =>DeletingHandler(item))">Delete</button>
+                                <button type="button" class="btn btn-primary" @onclick="(() =>EditHandler(item.User))">Edit</button>
+                                <button type="button" class="btn btn-danger" @onclick="(() =>DeletingHandler(item.User))">Delete</button>
                             </td>
                         </tr>
                     }
@@ -95,8 +82,9 @@
 
 
 @code {
-    IEnumerable<IdentityUser> userList;
+    @*IEnumerable<IdentityUser> userList;*@
     IEnumerable<IdentityRole> roleList;
+    IEnumerable<UserAndRole> usersWithRoles;
 
     IdentityUser userForUpdating;
     IdentityRole currentUserRole;
@@ -104,7 +92,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        userList = await _userManager.GetAllUsersAsync();
+        @*userList = await _userManager.GetAllUsersAsync();*@
+        usersWithRoles = await _userManager.GetAllUsersWithRoleAsync();
         roleList = await _roleManager.GetAllRolesAsync();
     }
 
@@ -115,7 +104,8 @@
         if (result)
         {
             await _js.ToastrSuccess($"{user.UserName} deleting successful!");
-            userList = await _userManager.GetAllUsersAsync();
+            @*userList = await _userManager.GetAllUsersAsync();*@
+            usersWithRoles = await _userManager.GetAllUsersWithRoleAsync();
         }
         else
             await _js.ToastrError($"Shit is happen... Not deleted!");
@@ -152,7 +142,8 @@
                 if (roleUpdateResult)
                 {
                     await _js.ToastrSuccess($"{userForUpdating.UserName} role updating: {currentUserRole.Name} successful!");
-                    userList = await _userManager.GetAllUsersAsync();
+                    @*userList = await _userManager.GetAllUsersAsync();*@
+                    usersWithRoles = await _userManager.GetAllUsersWithRoleAsync();
                 }
 
                 else
@@ -171,7 +162,8 @@
         {
             await _js.ToastrSuccess($"{userForUpdating.UserName} Updating successful!");
             OnShowCloseHandler();
-            userList = await _userManager.GetAllUsersAsync();
+            @*userList = await _userManager.GetAllUsersAsync();*@
+            usersWithRoles = await _userManager.GetAllUsersWithRoleAsync();
         }
         else
             await _js.ToastrError($"Shit is happen...");

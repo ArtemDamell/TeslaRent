@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using DataAccess.Data;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +16,6 @@ namespace Business.Repository.IRepository
 		Task<bool> DeleteUserAsync(IdentityUser user);
 		Task<IdentityRole?> GetCurrentUserRoleAsync(IdentityUser currentUser);
 		Task<bool> UpdateUserRole(IdentityUser user, IdentityRole newRole);
+		Task<IEnumerable<UserAndRole>> GetAllUsersWithRoleAsync();
 	}
 }

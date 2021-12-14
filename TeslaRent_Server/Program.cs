@@ -8,17 +8,17 @@ using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddLogging(loggingBuilder => {
-    loggingBuilder.AddConsole()
-        .AddFilter(DbLoggerCategory.Database.Command.Name, LogLevel.Information);
-    loggingBuilder.AddDebug();
-});
+//builder.Services.AddLogging(loggingBuilder => {
+//    loggingBuilder.AddConsole()
+//        .AddFilter(DbLoggerCategory.Database.Command.Name, LogLevel.Information);
+//    loggingBuilder.AddDebug();
+//});
 
 // Add services to the container.
 // 10. �������� ������������ ���� ������
 builder.Services.AddDbContext<ApplicationDbContext>(options => { 
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-        options.EnableSensitiveDataLogging(true);
+        //options.EnableSensitiveDataLogging(true);
 });
 // 99. В последней версии .NET это сделалось автоматически, но тут нет ролей! ПЕРЕПИСЫВАЕМ!!!
 //builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)

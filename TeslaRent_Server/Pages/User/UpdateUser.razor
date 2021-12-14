@@ -8,7 +8,7 @@
         <EditForm Model="@OnUser" OnValidSubmit="SubmitHandler">
             <div class="modal-content">
 
-                <div class="modal-header bg-success">
+                <div class="modal-header bg-primary">
                     <h5 class="modal-title text-white" id="exModalLabel">@title User</h5>
                     <button type="button" class="btn-close bg-white" @onclick="OnShowCloseHandler" datadata-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true"></span>
@@ -43,10 +43,10 @@
                                 <label>Roles</label>
                                 <div>
                                     <InputSelect @bind-Value="@selectedRoleId" class="form-control form-select">
-                                        <option value="" selected>Select role</option>
+                                        <option value="">Select role</option>
                                         @foreach (var role in OnRoleList)
                                         {
-                                            <option value="@role.Id" selected="@((OnCurrentRole is not null && OnCurrentRole.Id == role.Id) ? true : false)">@role.Name</option>
+                                            <option value="@role.Id">@role.Name</option>
                                         }
                                     </InputSelect>
                                 </div>
@@ -111,6 +111,12 @@
 
     string selectedRoleId = string.Empty;
     string title = "Update";
+
+    protected override void OnInitialized()
+    {
+        if (OnCurrentRole.Name is not null)
+            selectedRoleId = OnCurrentRole.Id;
+    }
 
     void SubmitHandler()
     {

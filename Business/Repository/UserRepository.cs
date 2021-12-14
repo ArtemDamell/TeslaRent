@@ -1,6 +1,8 @@
 ﻿using Business.Repository.IRepository;
+using DataAccess.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,6 +88,24 @@ namespace Business.Repository
                     return true;
                 return false;
             }
+        }
+
+        public async Task<IEnumerable<UserAndRole>> GetAllUsersWithRoleAsync()
+        {
+            List<UserAndRole> users = new();
+
+            var tempUsers = await _userManager.Users.ToListAsync();
+
+            foreach (var item in tempUsers)
+            {
+                users.Add(new UserAndRole
+                {
+                    User = item,
+                    Role = await GetCurrentUserRoleAsync(item)
+                });
+            }
+
+            return users;
         }
     }
 }
