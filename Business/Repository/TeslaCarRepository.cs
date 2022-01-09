@@ -64,9 +64,9 @@ namespace Business.Repository
 				return _mapper.Map<TeslaCar, TeslaCarDTO>(addedCar.Entity);
 			}
 			catch (Exception ex)
-            {
+			{
 				throw ex;
-            }
+			}
 
 			
 			// --> Далее, реализовываем остальные методы
@@ -113,10 +113,14 @@ namespace Business.Repository
 		{
 			try
 			{
-				TeslaCarDTO car = _mapper.Map<TeslaCar, TeslaCarDTO>(
-					await _db.TeslaCars.AsNoTracking().Include(x => x.CarAccessories).FirstOrDefaultAsync(x => x.Id == carId));
+				//TeslaCarDTO car = _mapper.Map<TeslaCar, TeslaCarDTO>(
+				//	await _db.TeslaCars/*.AsNoTracking()*/.Include(x => x.CarAccessories).FirstOrDefaultAsync(x => x.Id == carId));
+				// Получаем машину из базы с подключённой таблицей
+				var car = await _db.TeslaCars.AsNoTracking().Include(x => x.CarAccessories).FirstOrDefaultAsync(x => x.Id == carId);
+				// Перегоняем в DTO
+				var carDTO = _mapper.Map<TeslaCar, TeslaCarDTO>(car);
 
-				return car;
+				return carDTO;
 			}
 			catch (Exception ex)
 			{
@@ -167,9 +171,15 @@ namespace Business.Repository
 				if (carId == carForUpdating.Id)
 				{
 					// Получаем данные из базы
-					var carDetailsFromDb = await _db.TeslaCars.FirstOrDefaultAsync(x => x.Id == carId);
+					var carDetailsFromDb = await _db.TeslaCars.Include(x => x.CarAccessories).FirstOrDefaultAsync(x => x.Id == carId);
+
+					// Clear DB Accessories
+					carDetailsFromDb.CarAccessories.Clear();
+					var entity = _db.Update(carDetailsFromDb);
+					await _db.SaveChangesAsync();
+
 					// Конвертируем полученные данные из DTO в обычную модель для сохранения в базе
-					var car = _mapper.Map<TeslaCarDTO, TeslaCar>(carForUpdating, carDetailsFromDb);
+					var car = _mapper.Map<TeslaCarDTO, TeslaCar>(carForUpdating, entity.Entity);
 
 					// Добавляем недостающие свойства
 					car.UpdatedBy = "";
@@ -181,7 +191,8 @@ namespace Business.Repository
 					// Сохраняем изменения в базе данных
 					await _db.SaveChangesAsync();
 
-					return _mapper.Map<TeslaCar, TeslaCarDTO>(car);
+					var result = _mapper.Map<TeslaCar, TeslaCarDTO>(car);
+					return result;
 				}
 				else
 				{
@@ -196,15 +207,20 @@ namespace Business.Repository
 		}
 
 		public async Task<IEnumerable<CarAccessoryDTO>> GetAllCarAccessories()
-        {
-			var allAccessories = _mapper.Map<IEnumerable<CarAccessory>, IEnumerable<CarAccessoryDTO>>(await _db.CarAccessories.ToListAsync());
+		{
+			var allAccessories = _mapper.Map<IEnumerable<CarAccessory>, IEnumerable<CarAccessoryDTO>>(await _db.CarAccessories.AsNoTracking().ToListAsync());
 			return allAccessories;
-        }
+		}
 
 		public async Task<CarAccessoryDTO> GetSingleAccessory(int id)
-        {
-			var accessory = _mapper.Map<CarAccessory, CarAccessoryDTO>(await _db.CarAccessories.FindAsync(id));
+		{
+			var accessory = _mapper.Map<CarAccessory, CarAccessoryDTO>(await _db.CarAccessories.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id));
 			return accessory;
-        }
+		}
+
+		public async Task<CarAccessory> GetAccessory(int id)
+		{
+			return await _db.CarAccessories.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+		}
 	}
 }

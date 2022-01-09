@@ -68,8 +68,8 @@
 }
 
 @code {
-    IEnumerable<IdentityRole> roleList;
-    IdentityRole roleObj;
+    IEnumerable<IdentityRole>? roleList;
+    IdentityRole? roleObj;
     bool ShowCloseModal = false;
 
     protected override async Task OnInitializedAsync()
@@ -79,7 +79,7 @@
 
     void OnShowCloseHandler()
     {
-            ShowCloseModal = !ShowCloseModal;
+        ShowCloseModal = !ShowCloseModal;
     }
 
     void AddRole()
@@ -96,6 +96,11 @@
 
     async Task DeleteRole(IdentityRole role)
     {
+        @*var modalResult = await _js.SA2Deleting("deleting");*@
+
+        @*if (!modalResult)
+            return;*@
+
         var result = await _roleManager.DeleteRoleAsync(role);
 
         if (result)

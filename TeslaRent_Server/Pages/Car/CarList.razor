@@ -1,7 +1,8 @@
 ﻿@*27.1 Создаём маршрут к компоненту*@
 @page "/car-list"
 @using TeslaRent_Server.Service.IService
-@inject ITeslaCarRepository _db
+@*@inject ITeslaCarRepository _db*@
+@inherits OwningComponentBase<ITeslaCarRepository>
 @inject IJSRuntime _js
 @inject IFileUpload _fileUpload
 
@@ -19,7 +20,7 @@
 		<h4 class="card-title text-info">All car's</h4>
 	</div>
 	<div class="col-3 offset-1">
-		<NavLink href="car-list/create" class="btn btn-info form-control">Add New Car</NavLink>
+		<NavLink href="car-list/create" class="btn btn-info form-control"><i class="fa-solid fa-square-plus"></i> New Car</NavLink>
 	</div>
 </div>
 
@@ -68,7 +69,7 @@
 				else
 				{
 					<tr>
-						<td colspan="5">
+						<td colspan="6">
 							<label>No cars found ...</label>
 						</td>
 					</tr>
@@ -96,7 +97,7 @@
 	// 31.3 Инициализируем массив значениями в методе жизненного цикла
 	protected override async Task OnInitializedAsync()
 	{
-		Cars = await _db.GetAllCars();
+		Cars = await Service.GetAllCars();
 	}
 
 	// 77.2/ 77.3 Добавляем метод удаления
@@ -105,7 +106,7 @@
 		if (isConfirmed && DeletingCarId is not null)
 		{
 			// 79. Изменить метод удаления машин
-			var carDTO = await _db.GetCar(DeletingCarId.Value);
+			var carDTO = await Service.GetCar(DeletingCarId.Value);
 			foreach(var item in carDTO.TeslaCarImages)
 			{
 				// 90.2 Меняем путь на абсолютный
@@ -117,10 +118,10 @@
 			// *********************************
 
 			// 77.3 --> Идём и модифицируем метод удаления в TeslaCarRepository метод DeleteCar(int carId)
-			await _db.DeleteCar(DeletingCarId.Value);
+			await Service.DeleteCar(DeletingCarId.Value);
 			await _js.ToastrSuccess($"{DeletingCarId.Value} deleting successful!");
 
-			Cars = await _db.GetAllCars();
+			Cars = await Service.GetAllCars();
 		}
 		ShowCloseModal = false;
 	}

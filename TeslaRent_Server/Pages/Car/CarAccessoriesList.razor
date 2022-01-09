@@ -13,7 +13,7 @@
         <h1 class="text-info my-2">Accessories</h1>
     </div>
     <div class="col d-flex justify-content-end">
-        <button type="button" class="btn btn-success my-2" @onclick="AddAccessory"><i class="fa-solid fa-square-plus"></i> New Acessory</button>
+        <button type="button" class="btn btn-success my-2" @onclick="ShowCloseModal"><i class="fa-solid fa-square-plus"></i> New Acessory</button>
     </div>
 </div>
 
@@ -45,8 +45,8 @@ else if (Accessories.Any())
                             <td><i class="@item.Icon"></i></td>
                             <td>
                                     <div class="btn-group">
-                                        <button class="btn btn-outline-primary"><i class="fas fa-pen-square"></i></button>
-                                        <button class="btn btn-outline-success"><i class="fa-brands fa-readme"></i></button>
+                                        <button class="btn btn-outline-primary" @onclick="(() => UpdateAccessory(item))"><i class="fas fa-pen-square"></i></button>
+                                        <button class="btn btn-outline-secondary"><i class="fa-brands fa-readme"></i></button>
                                         <button class="btn btn-outline-danger" @onclick="() => DeleteAccessory(item)"><i class="fas fa-trash"></i></button>
                                     </div>
                             </td>
@@ -64,7 +64,11 @@ else
     </div>
 }
 
-<CreateUpdateAccessory OnAccessory="accessoryDTO" OnShowCloseModal="showCloseModal"  OnShowCloseHandler="ShowCloseModal" />
+@if (showCloseModal)
+{
+    <CreateUpdateAccessory OnAccessory="accessoryDTO" OnShowCloseHandler="ShowCloseModal" OnSubmitHandler="SubmitHandler" />
+}
+
 
 @code {
     IEnumerable<CarAccessoryDTO> Accessories;
@@ -74,20 +78,51 @@ else
     protected override async Task OnInitializedAsync()
     {
         Accessories = await _db.GetAllAccessoriesAsync();
-        
+
     }
 
-    async Task AddAccessory()
+    void ShowCloseModal() 
     {
-        await ShowCloseModal(false);
-    }
-
-    async Task ShowCloseModal(bool update)
-    {
-        if (update)
-            Accessories = await _db.GetAllAccessoriesAsync();
+        if (showCloseModal)
+            accessoryDTO = new();
 
         showCloseModal = !showCloseModal;
+    }
+
+    async Task SubmitHandler(CarAccessoryDTO carAccessory)
+    {
+        // Check, if ID = 0 -> Create accessory, else -> Update accessory
+        if (carAccessory.Id.Equals(0))
+        {
+            // Create new accessory
+            var result = await _db.CreateAccessoryAsync(carAccessory);
+
+            if (result is not null)
+            {
+                await _js.ToastrSuccess($"{carAccessory.Name} creating successful");
+
+                Accessories = await _db.GetAllAccessoriesAsync();
+                ShowCloseModal();
+            }
+        }
+        else
+        {
+            var result = await _db.UpdateAccessoryAsync(carAccessory);
+
+            if (result is not null)
+            {
+                await _js.ToastrSuccess($"{result.Name} Updating successful!");
+
+                Accessories = await _db.GetAllAccessoriesAsync();
+                ShowCloseModal();
+            }
+        }
+    }
+
+    void UpdateAccessory(CarAccessoryDTO carAccessory)
+    {
+        accessoryDTO = carAccessory;
+        ShowCloseModal();
     }
 
     async Task DeleteAccessory(CarAccessoryDTO accessory)

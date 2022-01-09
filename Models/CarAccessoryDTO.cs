@@ -19,6 +19,6 @@ namespace Models
         public string Description { get; set; }
         [Required]
         public string Icon { get; set; }
-        public ICollection<TeslaCarDTO>? Car { get; set; }
+        public virtual ICollection<TeslaCarDTO>? Car { get; set; }
     }
 }

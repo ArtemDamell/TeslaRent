@@ -4,7 +4,8 @@
 @*46.2 Добавляем маршрут для редактирования*@
 @page "/car-list/edit/{Id:int}"
 
-@inject ITeslaCarRepository _db
+@*@inject ITeslaCarRepository _db*@
+@inherits OwningComponentBase<ITeslaCarRepository>
 @inject NavigationManager _navManager
 
 @*50 Внедряем функционал JS*@
@@ -19,7 +20,6 @@
 @inject ITeslaCarImageRepository _imageRepository
 @*************************************************************@
 @using System.Linq
-@*@inject ITeslaCarAccessoryRepository _acc*@
 @inject NavigationManager _navManager
 
 @*108.1 Комментируем атрибут Authorize*@
@@ -76,7 +76,7 @@
                         <div class="row mb-3">
                             @foreach (var icon in carModel.CarAccessories)
                             {
-                                <div class="col-1">
+                                <div class="col-1 border border-danger text-center py-3 mx-2" @onclick="(() => RemoveAccessory(icon))">
                                     <i class="@icon.Icon" style="font-size: 50px;"></i>
                                 </div>
                             }
@@ -204,25 +204,25 @@
     {
         // Далее, перед реализацией, добавляем ещё один маршрут для редактирования
 
-         // 109. Реализовываем логику проверки авторизации пользователя
-            var authState = await AuthenticationState;
-            //if (!authState.User.Identity.IsAuthenticated)
-            if (!authState.User.IsInRole(Common.SD.ADMIN_ROLE))
-            {
-                // 110. Добавить получение и отправку текущего url
-                var url = new Uri(_navManager.Uri);
-                _navManager.NavigateTo($"/identity/account/login?returnUrl={url.LocalPath}");
-            }
+        // 109. Реализовываем логику проверки авторизации пользователя
+        var authState = await AuthenticationState;
+        //if (!authState.User.Identity.IsAuthenticated)
+        if (!authState.User.IsInRole(Common.SD.ADMIN_ROLE))
+        {
+            // 110. Добавить получение и отправку текущего url
+            var url = new Uri(_navManager.Uri);
+            _navManager.NavigateTo($"/identity/account/login?returnUrl={url.LocalPath}");
+        }
 
         // 46.4 Реализовываем проверку, создаём или редактируем
         if (Id is not null)
         {
             // Updating
             title = "Update";
-            carModel = await _db.GetCar(Id.Value);
-            
+            carModel = await Service.GetCar(Id.Value);
 
-            var tempAccessories = await _db.GetAllCarAccessories();
+
+            var tempAccessories = await Service.GetAllCarAccessories();
             accessories = tempAccessories.ToList();
 
             // Updating accessories
@@ -230,7 +230,10 @@
             {
                 foreach (var item in carModel.CarAccessories.ToList())
                 {
-                    accessories.Remove(item);
+                    var itemToRemove = accessories.FirstOrDefault(x => x.Id == item.Id);
+
+                    if (itemToRemove is not null)
+                        accessories.Remove(itemToRemove);
                 }
             }
 
@@ -242,7 +245,7 @@
         {
             // Creating
             carModel = new();
-            var tempAccessories = await _db.GetAllCarAccessories();
+            var tempAccessories = await Service.GetAllCarAccessories();
             accessories = tempAccessories.ToList();
         }
         // После этого, идём в компонент листа и реализовываем кнопку редактирования
@@ -279,7 +282,7 @@
         // 48.2
         try
         {
-            var carDetailsByName = await _db.IsCarUnique(carModel.Name, carModel.Id);
+            var carDetailsByName = await Service.IsCarUnique(carModel.Name, carModel.Id);
             if (carDetailsByName is not null)
             {
                 await _js.ToastrError("Car name already exists.");
@@ -292,7 +295,7 @@
                 // 84.4 При создании получаем данные из визуального редактора
                 carModel.Details = await QuillHtml.GetHTML();
 
-                var updateCarResult = await _db.UpdateCar(carModel.Id, carModel);
+                var updateCarResult = await Service.UpdateCar(carModel.Id, carModel);
                 if (updateCarResult is not null)
                 {
                     // 68. Обновление картинок при редактировании машины
@@ -334,14 +337,14 @@
                 // 84.4 При создании получаем данные из визуального редактора
                 carModel.Details = await QuillHtml.GetHTML();
 
-                var createdCar = await _db.CreateCar(carModel);
+                var createdCar = await Service.CreateCar(carModel);
 
                 if (createdCar is not null)
                 {
                     // 65.1 новый метод AddCarImage
                     await AddCarImage(createdCar);
                     // *************************************
-                    await _js.ToastrSuccess($"{createdCar.Name} creating successful!");
+                    //await _js.ToastrSuccess($"{createdCar.Name} creating successful!");
                     _navManager.NavigateTo("car-list");
                 }
                 else
@@ -352,7 +355,7 @@
         }
         catch (Exception ex)
         {
-            // Do something with exception
+            await _js.ToastrSuccess($"{ex.Message}");
         }
 
         // На этом этапе переходим к внедрению зависимости нашего сервиса, шаг 30
@@ -477,20 +480,27 @@
 
     async Task ChangeCurrentCarHandler(ChangeEventArgs args)
     {
-        if (!string.IsNullOrWhiteSpace(args.Value.ToString()))
+        if (!string.IsNullOrWhiteSpace(args?.Value?.ToString()))
         {
             var accId = Convert.ToInt32(args.Value);
+            var existingItem = carModel?.CarAccessories?.FirstOrDefault(x => x.Id == accId);
 
-            if (carModel.CarAccessories.FirstOrDefault(x => x.Id == accId) == null)
+            if (existingItem is null)
             {
                 // Получаем обьъект для добавления
-                var accessory = await _db.GetSingleAccessory(accId);
+                var tempAccessory = accessories.FirstOrDefault(x => x.Id == accId);
 
-                carModel.CarAccessories.Add(accessory);
-
-                var listItem = accessories.FirstOrDefault(x => x.Id == accessory.Id);
-                accessories.Remove(listItem);
+                carModel?.CarAccessories?.Add(tempAccessory);
+                accessories.Remove(tempAccessory);
             }
         }
+    }
+
+    async Task RemoveAccessory(CarAccessoryDTO icon)
+    {
+        var removingAccessoryModel = carModel.CarAccessories.FirstOrDefault(x => x.Id == icon.Id);
+
+        carModel?.CarAccessories?.Remove(removingAccessoryModel);
+        accessories.Add(icon);
     }
 }

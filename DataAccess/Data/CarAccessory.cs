@@ -19,7 +19,7 @@ namespace DataAccess.Data
         public string Description { get; set; }
         [Required]
         public string Icon { get; set; }
-        public ICollection<TeslaCar>? Car { get; set; }
+        public virtual ICollection<TeslaCar>? Car { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
