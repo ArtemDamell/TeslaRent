@@ -15,7 +15,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => {
 });
 
 // 120.2 Строка подключения
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+//127.В классе Program обновляем конфигурацию Identity с IdentityUser на ApplicationUser
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 

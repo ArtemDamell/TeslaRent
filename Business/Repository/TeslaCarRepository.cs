@@ -98,7 +98,7 @@ namespace Business.Repository
 			try
 			{
 				IEnumerable<TeslaCarDTO> teslaCarDTOs =
-					_mapper.Map<IEnumerable<TeslaCar>, IEnumerable<TeslaCarDTO>>(await _db.TeslaCars.AsNoTracking().Include(x => x.CarAccessories).ToListAsync());
+					_mapper.Map<IEnumerable<TeslaCar>, IEnumerable<TeslaCarDTO>>(await _db.TeslaCars/*.Include(x => x.CarAccessories)*/.ToListAsync());
 
 				return teslaCarDTOs;
 			}
@@ -116,7 +116,7 @@ namespace Business.Repository
 				//TeslaCarDTO car = _mapper.Map<TeslaCar, TeslaCarDTO>(
 				//	await _db.TeslaCars/*.AsNoTracking()*/.Include(x => x.CarAccessories).FirstOrDefaultAsync(x => x.Id == carId));
 				// Получаем машину из базы с подключённой таблицей
-				var car = await _db.TeslaCars.AsNoTracking().Include(x => x.CarAccessories).FirstOrDefaultAsync(x => x.Id == carId);
+				var car = await _db.TeslaCars/*.AsNoTracking().Include(x => x.CarAccessories)*/.FirstOrDefaultAsync(x => x.Id == carId);
 				// Перегоняем в DTO
 				var carDTO = _mapper.Map<TeslaCar, TeslaCarDTO>(car);
 

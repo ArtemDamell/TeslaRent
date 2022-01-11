@@ -4,7 +4,8 @@ using Microsoft.EntityFrameworkCore;
 namespace DataAccess.Data
 {
     // 6.1 Реализовываем класс
-    public class ApplicationDbContext : IdentityDbContext
+    // 125. Указать новый класс пользователя, чтобы Entity Framework использовал его по умолчанию
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         // 6.2 Настраиваем параметры контекста данных
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
