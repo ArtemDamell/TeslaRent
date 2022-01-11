@@ -206,7 +206,7 @@ namespace Business.Repository
 			}
 		}
 
-		public async Task<IEnumerable<CarAccessoryDTO>> GetAllCarAccessories()
+		public async Task<IEnumerable<CarAccessoryDTO>> GetAllCarAccessories() 
 		{
 			var allAccessories = _mapper.Map<IEnumerable<CarAccessory>, IEnumerable<CarAccessoryDTO>>(await _db.CarAccessories.AsNoTracking().ToListAsync());
 			return allAccessories;
