@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Models;
+using Microsoft.AspNetCore.Authorization;
+using Common;
 
 namespace TeslaCar_API.Controllers
 {
@@ -18,6 +20,8 @@ namespace TeslaCar_API.Controllers
         }
 
         // 122.3 Создаём метод получения всех машин
+        // 146.1 Закроем метод получения всех машин на обычную авторизацию [Authorize]
+        //[Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllCars()
         {
@@ -26,6 +30,8 @@ namespace TeslaCar_API.Controllers
         }
 
         // --> На этом месте создаём ErrorModel в проекте Models
+        // 146.2 Закроем метод получения получение машины по ID на авторизацию с ролью администратора
+        //[Authorize(Roles = SD.ADMIN_ROLE)]
         [HttpGet("{carId}")]
         public async Task<IActionResult> GetSingleTeslaCar(int? carId)
         {
