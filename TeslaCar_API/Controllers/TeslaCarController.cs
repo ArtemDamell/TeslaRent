@@ -31,7 +31,7 @@ namespace TeslaCar_API.Controllers
 
         // --> На этом месте создаём ErrorModel в проекте Models
         // 146.2 Закроем метод получения получение машины по ID на авторизацию с ролью администратора
-        //[Authorize(Roles = SD.ADMIN_ROLE)]
+        [Authorize(Roles = SD.ADMIN_ROLE)]
         [HttpGet("{carId}")]
         public async Task<IActionResult> GetSingleTeslaCar(int? carId)
         {
