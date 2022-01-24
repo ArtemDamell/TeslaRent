@@ -110,7 +110,7 @@
             indexVM.EndDate = indexVM.StartDate.AddDays(indexVM.RentDays);
 
             await _localStorage.SetItemAsync(SD.LOCAL_INITIALBOOKING, indexVM);
-            _navManager.NavigateTo("cars/all", true);
+            _navManager.NavigateTo("cars/allexs", true);
         }
         catch (Exception e)
         {

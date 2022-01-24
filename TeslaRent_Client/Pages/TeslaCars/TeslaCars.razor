@@ -1,5 +1,36 @@
-﻿@page "/cars/all"
+﻿@page "/cars/allexs"
+
+@*169. Переходим в компонент TeslaCars проекта TeslaRent_Client и начинаем его реализовывать*@
+@inject ILocalStorageService _localStorage
+@inject IJSRuntime _js
+@inject ICarService _carService
 
 @code {
+    IndexVM? indexModel = new();
+    public IEnumerable<TeslaCarDTO> Cars { get; set; } = new List<TeslaCarDTO>();
 
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (await _localStorage.GetItemAsync<IndexVM>(SD.LOCAL_INITIALBOOKING) is not null)
+            {
+                indexModel = await _localStorage.GetItemAsync<IndexVM>(SD.LOCAL_INITIALBOOKING);
+            }
+            else
+            {
+                indexModel.RentDays = 1;
+            }
+            await LoadCars();
+        }
+        catch (Exception ex)
+        {
+            await _js.ToastrError(ex.Message);
+        }
+    }
+
+    async Task LoadCars()
+    {
+        Cars = await _carService.GetAllExistingCars(indexModel.StartDate.ToString("MM.dd.yyyy"), indexModel.EndDate.ToString("MM.dd.yyyy"));
+    }
 }

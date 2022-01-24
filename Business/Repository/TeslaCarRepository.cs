@@ -88,7 +88,8 @@ namespace Business.Repository
 			return 0;
 		}
 
-		public async Task<IEnumerable<TeslaCarDTO>> GetAllCars()
+		// 167.1 Обновить методы в TeslaCarRepository
+		public async Task<IEnumerable<TeslaCarDTO>> GetAllCars(string? startRentDate = null, string? endRentDate = null)
 		{
 			/* 
 			 * Т.к. логика может вызвать разнообразные ошибки и обвалить
@@ -109,7 +110,8 @@ namespace Business.Repository
 			}
 		}
 
-		public async Task<TeslaCarDTO> GetCar(int carId)
+		// 167.2 Обновить методы в TeslaCarRepository
+		public async Task<TeslaCarDTO> GetCar(int carId, string? startRentDate = null, string? endRentDate = null)
 		{
 			try
 			{
