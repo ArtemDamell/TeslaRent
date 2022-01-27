@@ -71,5 +71,5 @@ a, .btn-link {
     background-image: url("/Images/index_bg.jpg");
     background-size: cover; 
     background-attachment: fixed;
-    min-height: 94vh;
+    min-height: 100vh;
 }
