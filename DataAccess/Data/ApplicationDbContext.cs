@@ -26,5 +26,8 @@ namespace DataAccess.Data
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
         // 175.2 --> После этого создаём миграцию
+
+        // 180. Добавить новую модель в контекст данных 
+        public DbSet<CarOrderDetails> CarOrderDetails { get; set; }
     }
 }

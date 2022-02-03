@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DataAccess.Data;
 using Models;
+using Models.DTO;
 
 namespace Business.Mapper
 {
@@ -36,6 +37,9 @@ namespace Business.Mapper
 
             // 86. Выполнение домашнего задания
             CreateMap<CarAccessory, CarAccessoryDTO>().ReverseMap();
+
+            // 183.1 После имплементации методов, добавляем карту для автомаппера в MappingProfile 
+            CreateMap<CarOrderDetails, CarOrderDetailsDTO>().ReverseMap();
         }
     }
 }

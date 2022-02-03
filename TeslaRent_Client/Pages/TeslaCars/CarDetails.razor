@@ -1,6 +1,10 @@
 ﻿@*178. Создать новый компонент CarDetails и сверстать его*@
 @page "/car/car-details/{carId:int}"
 
+@*188.2 *@
+@inject IJSRuntime _js
+@inject ILocalStorageService _localStorage
+
 <div class="mx-4 mt-3 px-0 px-md-3 mx-md-3" style="border-radius: 20px; border: 1px groove #000; background-color: #ffffffe6;">
 
     <div class="row p-2 my-3" style="border-radius: 20px;">
@@ -26,15 +30,7 @@
                                     data-mdb-slide-to="0"
                                     class="active"
                                     aria-current="true"
-                                    aria-label="Slide 1"></button>
-                            @*<button type="button"
-                                data-mdb-target="#carouselBasicExample"
-                                data-mdb-slide-to="1"
-                                aria-label="Slide 2"></button>
-                                <button type="button"
-                                data-mdb-target="#carouselBasicExample"
-                                data-mdb-slide-to="2"
-                                aria-label="Slide 3"></button>*@
+                                    aria-label="Slide 1"></button>                            
                         </div>
 
                         <!-- Inner -->
@@ -135,4 +131,30 @@
 
 @code {
     [Parameter] public int? CarId { get; set; }
+
+    // 188.1 Начинаем реализацию компонента CarDetails *****
+    public CarBookingVM carBookingVM { get; set; } = new();
+    int DaysNumber = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            carBookingVM.OrderDetails = new();
+
+            if (CarId is not null)
+            {
+                if (await _localStorage.GetItemAsync<IndexVM>(SD.LOCAL_INITIALBOOKING) is not null)
+                {
+                    
+                }
+            }
+
+        }
+        catch (Exception ex)
+        {
+            await _js.ToastrError(ex.Message);
+        }
+    }
+    // **********************************************************
 }

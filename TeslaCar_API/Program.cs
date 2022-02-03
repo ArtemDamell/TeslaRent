@@ -64,6 +64,9 @@ builder.Services.AddScoped<ITeslaCarRepository, TeslaCarRepository>();
 builder.Services.AddScoped<ITeslaCarImageRepository, TeslaCarImageRepository>();
 builder.Services.AddScoped<ITeslaCarAccessoryRepository, TeslaCarAccessoryRepository>();
 
+// 184. Добавить ICarOrderDetailsRepository в класс Program, проекта API
+builder.Services.AddScoped<ICarOrderDetailsRepository, CarOrderDetailsRepository>();
+
 
 // 141.1 Следующим шагом будет настройка политики доступа к API в классе Program API
 builder.Services.AddCors(x => x.AddPolicy("TeslaRent", builder =>

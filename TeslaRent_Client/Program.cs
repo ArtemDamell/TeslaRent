@@ -18,4 +18,7 @@ builder.Services.AddBlazoredLocalStorage();
 
 builder.Services.AddScoped<ICarService, CarService>();
 
+// 186. Регистрируем новый сервис в классе Program TeslaRent_Client
+builder.Services.AddScoped<ICarOrderDetailsService, CarOrderDetailsService>();
+
 await builder.Build().RunAsync();
