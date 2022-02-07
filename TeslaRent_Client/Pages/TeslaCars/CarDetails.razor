@@ -4,130 +4,154 @@
 @*188.2 *@
 @inject IJSRuntime _js
 @inject ILocalStorageService _localStorage
+@inject ICarService _carService
 
-<div class="mx-4 mt-3 px-0 px-md-3 mx-md-3" style="border-radius: 20px; border: 1px groove #000; background-color: #ffffffe6;">
+@*191. Так, как по прежнему ошибка осталась, заключить в блок IF разметку компонента CarDetails*@
+@if (carBookingVM?.OrderDetails?.TeslaCarDTO?.TeslaCarImages is null)
+{
+    <div class="text-center">
+        <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/2796ed81999693.5d10c0872415e.gif" />
+    </div>
+}
+else
+{
+    <div class="mx-4 mt-3 px-0 px-md-3 mx-md-3" style="border-radius: 20px; border: 1px groove #000; background-color: #ffffffe6;">
 
-    <div class="row p-2 my-3" style="border-radius: 20px;">
-        <div class="col-sm-12 col-md-7 p-4">
-            <div class="row pb-3 px-2 text-success border-bottom border-dark">
-                <div class="col-8 py-1">
-                    <p style="font-size:x-large; margin:0px;">Selected car</p>
-                </div>
-                <div class="col-4 p-0 d-flex justify-content-end align-items-center">
-                    <a href="cars/allexs" class="btn btn-secondary">Back to Car's</a>
-                </div>
-            </div>
-
-            <div class="row mt-2">
-                <div class="col-sm-12 col-md-6">
-
-                    <!-- Carousel wrapper -->
-                    <div id="carouselBasicExample" class="carousel slide carousel-fade" data-mdb-ride="carousel">
-                        <!-- Indicators -->
-                        <div class="carousel-indicators">
-                            <button type="button"
-                                    data-mdb-target="#carouselBasicExample"
-                                    data-mdb-slide-to="0"
-                                    class="active"
-                                    aria-current="true"
-                                    aria-label="Slide 1"></button>                            
-                        </div>
-
-                        <!-- Inner -->
-                        <div class="carousel-inner">
-                            <!-- Single item -->
-                            <div class="carousel-item active h-25">
-                                <img src="https://images.hdqwalls.com/wallpapers/tesla-model-3-2017-lf.jpg" class="d-block w-100" alt="Sunset Over the City" />
-                            </div>
-
-
-                            <!-- Inner -->
-                            <!-- Controls -->
-                            <button class="carousel-control-prev" type="button" data-mdb-target="#carouselBasicExample" data-mdb-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Previous</span>
-                            </button>
-                            <button class="carousel-control-next" type="button" data-mdb-target="#carouselBasicExample" data-mdb-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Next</span>
-                            </button>
-                        </div>
+        <div class="row p-2 my-3" style="border-radius: 20px;">
+            <div class="col-sm-12 col-md-7 p-4">
+                <div class="row pb-3 px-2 text-success border-bottom border-dark">
+                    <div class="col-8 py-1">
+                        <p style="font-size:x-large; margin:0px;">Selected car</p>
                     </div>
-                    <!-- Carousel wrapper -->
-
-                </div>
-
-                <div class="col-sm-12 col-md-6">
-                    <span class="float-md-end pt-4">
-                        <span class="float-md-end">Seats count: ##</span><br />
-                        <h4 class="text-warning font-weight-bold pt-md-2 float-md-end"><span style="border-bottom: 1px solid #ff6a00">####</span> €</h4><br />
-                        <span class="float-md-end">Cost for #### day(s)</span>
-                    </span>
-                </div>
-
-            </div>
-
-            <div class="row p-2">
-                <div class="col-12">
-                    <p class="card-title text-warning" style="font-size:xx-large:">##NAME##</p>
-                    <p class="card-text" style="font-size: large;">##DETAILS##</p>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="col-12 col-lg-5 p-4 mt-2 mt-md-0 border-start border-dark">
-            <form Model="CarBooking" class="container" OnValidSubmit="CheckOutHandler">
-
-                <div class="row px-2 text-success border-bottom border-dark">
-                    <div class="col-7 py-1">
-                        <p style="font-size: x-large; margin: 0px;">Enter Details</p>
+                    <div class="col-4 p-0 d-flex justify-content-end align-items-center">
+                        <NavLink href="cars/allexs" class="btn btn-secondary">Back to Car's</NavLink>
                     </div>
                 </div>
 
                 <div class="row mt-2">
-                    <div class="form-group pt-2">
-                        <label class="text-warning">Name</label>
-                        <input type="text" class="form-control" />
-                    </div>
-                    <div class="form-group pt-2">
-                        <label class="text-warning">Phone</label>
-                        <input type="text" class="form-control" />
-                    </div>
-                    <div class="form-group pt-2">
-                        <label class="text-warning">Email</label>
-                        <input type="text" class="form-control" />
-                    </div>
-                    <div class="form-group pt-2">
-                        <label class="text-warning">Start rent date</label>
-                        <input type="date" disabled="disabled" class="form-control" />
-                    </div>
-                    <div class="form-group pt-2">
-                        <label class="text-warning">End rent date</label>
-                        <input type="date" disabled="disabled" class="form-control" />
-                    </div>
-                    <div class="form-group pt-2">
-                        <label class="text-warning">Rent day(s)</label>
-                        <select class="form-control form-select">
-                            @for (var i = 1; i < 31; i++)
-                            {
-                                <option value="@i">@i</option>
-                            }
-                        </select>
-                    </div>
+                    <div class="col-sm-12 col-md-6">
 
-                    <div class="form-group mt-3">
-                        <button type="submit" class="btn btn-success form-control">Checkout now</button>
+                        <!-- Carousel wrapper -->
+                    <div id="carouselBasicExample" class="carousel slide carousel-fade" data-mdb-ride="carousel">
+                            <!-- Indicators -->
+                        <div class="carousel-indicators">
+                                <button type="button"
+                                    data-mdb-target="#carouselBasicExample"
+                                    data-mdb-slide-to="0"
+                                    class="active"
+                                    aria-current="true"
+                                    aria-label="Slide 1"></button>
+                            </div>
+
+                            <!-- Inner -->
+                        <div class="carousel-inner">
+                                <!-- Single item -->
+                            <div class="carousel-item active h-25">
+                                    <img src="https://images.hdqwalls.com/wallpapers/tesla-model-3-2017-lf.jpg" class="d-block w-100" alt="Sunset Over the City" />
+                                </div>
+
+
+                                <!-- Inner -->
+                                <!-- Controls -->
+                            <button class="carousel-control-prev" type="button" data-mdb-target="#carouselBasicExample" data-mdb-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-mdb-target="#carouselBasicExample" data-mdb-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Carousel wrapper -->
+
+                </div>
+
+                    <div class="col-sm-12 col-md-6">
+                        <span class="float-md-end pt-4">
+                            <span class="float-md-end">Seats count: @carBookingVM.OrderDetails.TeslaCarDTO.NumberOfSeats</span><br />
+                            <h4 class="text-warning font-weight-bold pt-md-2 float-md-end"><span style="border-bottom: 1px solid #ff6a00">@carBookingVM.OrderDetails.TeslaCarDTO.TotalAmount.ToString("#,#.00#;(#,#.00#)")</span> €</h4><br />
+                            <span class="float-md-end">Cost for @carBookingVM.OrderDetails.TeslaCarDTO.TotalDays day(s)</span>
+                        </span>
                     </div>
 
                 </div>
 
+                <div class="row p-2">
+                    <div class="col-12">
+                        <p class="card-title text-warning" style="font-size:xx-large:">@carBookingVM.OrderDetails.TeslaCarDTO.Name</p>
+                        <p class="card-text" style="font-size: large;">@((MarkupString)carBookingVM.OrderDetails.TeslaCarDTO.Details)</p>
+                    </div>
+                </div>
 
-            </form>
+            </div>
+
+
+            @*192. На этом шаге начинаем работать над формой заказа, превратив из шаблона html в Blazor Form*@
+            <div class="col-12 col-lg-5 p-4 mt-2 mt-md-0 border-start border-dark">
+                <EditForm Model="carBookingVM" class="container" OnValidSubmit="CheckOutHandler">
+                    @*<DataAnnotationsValidator />*@
+
+                    <div class="row px-2 text-success border-bottom border-dark">
+                        <div class="col-7 py-1">
+                            <p style="font-size: x-large; margin: 0px;">Enter Details</p>
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="form-group pt-2">
+                            <label class="text-warning">Name</label>
+                            <InputText class="form-control" @bind-Value="carBookingVM.OrderDetails.Name" />
+                            @*                            <ValidationMessage For="(() => carBookingVM.OrderDetails.Name)" />*@
+                        </div>
+                        <div class="form-group pt-2">
+                            <label class="text-warning">Phone</label>
+                            <InputText class="form-control" @bind-Value="carBookingVM.OrderDetails.Phone" />
+                        </div>
+                        <div class="form-group pt-2">
+                            <label class="text-warning">Email</label>
+                            <InputText class="form-control" @bind-Value="carBookingVM.OrderDetails.Email" />
+                        </div>
+                        <div class="form-group pt-2">
+                            <label class="text-warning">Start rent date</label>
+                            <InputDate disabled="disabled" class="form-control" @bind-Value="carBookingVM.OrderDetails.StartRentDate" />
+                        </div>
+                        <div class="form-group pt-2">
+                            <label class="text-warning">End rent date</label>
+                            <InputDate disabled="disabled" class="form-control" @bind-Value="carBookingVM.OrderDetails.EndRentDate" />
+                        </div>
+                        <div class="form-group pt-2">
+                            <label class="text-warning">Rent day(s)</label>
+                            <select class="form-control form-select" value="@DaysNumber" @onchange="DaysNumberChangeHandler">
+                                @for (var i = 1; i < 31; i++)
+                                {
+                                    @if (i == DaysNumber)
+                                    {
+                                        <option value="@i" selected="selected">@i</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@i">@i</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <button type="submit" class="btn btn-success form-control">Checkout now</button>
+                        </div>
+
+                    </div>
+
+
+                </EditForm>
+            </div>
         </div>
-    </div>
 
-</div>
+    </div>
+}
+
+
 
 @code {
     [Parameter] public int? CarId { get; set; }
@@ -146,8 +170,23 @@
             {
                 if (await _localStorage.GetItemAsync<IndexVM>(SD.LOCAL_INITIALBOOKING) is not null)
                 {
-                    
+                    var carInitializer = await _localStorage.GetItemAsync<IndexVM>(SD.LOCAL_INITIALBOOKING);
+                    carBookingVM.OrderDetails.TeslaCarDTO = await _carService.GetCarDetails(CarId.Value, carInitializer.StartDate.ToString("MM.dd.yyyy"), carInitializer.EndDate.ToString("MM.dd.yyyy"));
+                    DaysNumber = carInitializer.RentDays;
+                    carBookingVM.OrderDetails.StartRentDate = carInitializer.StartDate;
+                    carBookingVM.OrderDetails.EndRentDate = carInitializer.EndDate;
+                    carBookingVM.OrderDetails.TeslaCarDTO.TotalDays = carInitializer.RentDays;
+                    carBookingVM.OrderDetails.TeslaCarDTO.TotalAmount = carInitializer.RentDays * carBookingVM.OrderDetails.TeslaCarDTO.RegularRate;
                 }
+            }
+            else
+            {
+                carBookingVM.OrderDetails.TeslaCarDTO = await _carService.GetCarDetails(CarId.Value, DateTime.Now.ToString("MM.dd.yyyy"), DateTime.Now.AddDays(1).ToString("MM.dd.yyyy"));
+                DaysNumber = 1;
+                carBookingVM.OrderDetails.StartRentDate = DateTime.Now;
+                carBookingVM.OrderDetails.EndRentDate = DateTime.Now.AddDays(1);
+                carBookingVM.OrderDetails.TeslaCarDTO.TotalDays = 1;
+                carBookingVM.OrderDetails.TeslaCarDTO.TotalAmount = carBookingVM.OrderDetails.TeslaCarDTO.RegularRate;
             }
 
         }
@@ -157,4 +196,42 @@
         }
     }
     // **********************************************************
+
+    async Task DaysNumberChangeHandler(ChangeEventArgs args)
+    {
+        DaysNumber = Convert.ToInt32(args.Value.ToString());
+        carBookingVM.OrderDetails.TeslaCarDTO = await _carService.GetCarDetails(CarId.Value, carBookingVM.OrderDetails.StartRentDate.ToString("MM.dd.yyyy"), carBookingVM.OrderDetails.StartRentDate.AddDays(DaysNumber).ToString("MM.dd.yyyy"));
+        carBookingVM.OrderDetails.EndRentDate = carBookingVM.OrderDetails.StartRentDate.AddDays(DaysNumber);
+        carBookingVM.OrderDetails.TeslaCarDTO.TotalDays = DaysNumber;
+        carBookingVM.OrderDetails.TeslaCarDTO.TotalAmount = DaysNumber * carBookingVM.OrderDetails.TeslaCarDTO.RegularRate;
+    }
+
+    async Task CheckOutHandler()
+    {
+        if (!await ValidationHandler())
+            return;
+
+
+    }
+
+    async Task<bool> ValidationHandler()
+    {
+        if (string.IsNullOrWhiteSpace(carBookingVM.OrderDetails.Name))
+        {
+            await _js.ToastrError("Name cannot be empty");
+            return false;
+        }
+        if (string.IsNullOrWhiteSpace(carBookingVM.OrderDetails.Phone))
+        {
+            await _js.ToastrError("Phone cannot be empty");
+            return false;
+        }
+        if (string.IsNullOrWhiteSpace(carBookingVM.OrderDetails.Email))
+        {
+            await _js.ToastrError("Email cannot be empty");
+            return false;
+        }
+
+        return true;
+    }
 }

@@ -1,4 +1,5 @@
-﻿using Models.DTO;
+﻿using Common;
+using Models.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace Business.Repository.IRepository
         Task<CarOrderDetailsDTO> MarkPaymentSuccessfulAsync(int id);
         Task<CarOrderDetailsDTO> GetCarOrderDetailsAsync(int carOrderId);
         Task<IEnumerable<CarOrderDetailsDTO>> GetAllCarOrderDetailsAsync();
-        Task<bool> UpdateOrderStatusAsync(int carDetailsId, string status);
+        Task<bool> UpdateOrderStatusAsync(int carDetailsId, Status status);
         Task<bool> IsCarBookedAsync(int carId, DateTime startRentDate, DateTime endRentDate);
     }
 }

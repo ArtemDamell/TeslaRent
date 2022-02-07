@@ -113,7 +113,7 @@ namespace Business.Repository
             throw new NotImplementedException();
         }
 
-        public Task<bool> UpdateOrderStatusAsync(int carDetailsId, string status)
+        public Task<bool> UpdateOrderStatusAsync(int carDetailsId, Status status)
         {
             throw new NotImplementedException();
         }
