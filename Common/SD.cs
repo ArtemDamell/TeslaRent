@@ -15,5 +15,7 @@ namespace Common
 
         // 161. Добавить константу в класс SD для хранения ключа LocalStorage
         public const string LOCAL_INITIALBOOKING = "InitialBookingInfo";
+
+        public const string LOCAL_CAR_ORDER_DETAILS = "InitialCarBookingInfo";
     }
 }

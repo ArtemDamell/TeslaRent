@@ -27,7 +27,7 @@ namespace Models
         // 61. Копируем свойство для картинки
         public virtual ICollection<TeslaCarImageDTO>? TeslaCarImages { get; set; }
 
-        public List<string> ImageUrls { get; set; }
+        public List<string>? ImageUrls { get; set; }
 
         // 86. Домашнее задание
         public virtual ICollection<CarAccessoryDTO>? CarAccessories { get; set; }

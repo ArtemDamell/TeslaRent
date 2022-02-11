@@ -37,7 +37,7 @@ namespace TeslaCar_API.Controllers
                         {
                             PriceData = new SessionLineItemPriceDataOptions
                             {
-                                UnitAmount = payment.Amount * 100, // Конвертируем в центы
+                                UnitAmount = payment.Amount, // Конвертируем в центы
                                 Currency = "eur",
                                 ProductData = new SessionLineItemPriceDataProductDataOptions
                                 {

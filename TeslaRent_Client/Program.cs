@@ -21,4 +21,7 @@ builder.Services.AddScoped<ICarService, CarService>();
 // 186. Регистрируем новый сервис в классе Program TeslaRent_Client
 builder.Services.AddScoped<ICarOrderDetailsService, CarOrderDetailsService>();
 
+// 204. Сконфигурировать зависимость сервиса IStripePaymentService в классе Program проекта Client
+builder.Services.AddScoped<IStripePaymentService, StripePaymentService>();
+
 await builder.Build().RunAsync();

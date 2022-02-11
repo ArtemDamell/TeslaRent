@@ -1,10 +1,13 @@
 ﻿@*178. Создать новый компонент CarDetails и сверстать его*@
 @page "/car/car-details/{carId:int}"
+@using Models.DTO
 
 @*188.2 *@
 @inject IJSRuntime _js
 @inject ILocalStorageService _localStorage
 @inject ICarService _carService
+@inject IStripePaymentService _stripeService
+@inject ICarOrderDetailsService _carOrderDetailsService
 
 @*191. Так, как по прежнему ошибка осталась, заключить в блок IF разметку компонента CarDetails*@
 @if (carBookingVM?.OrderDetails?.TeslaCarDTO?.TeslaCarImages is null)
@@ -210,6 +213,36 @@ else
     {
         if (!await ValidationHandler())
             return;
+
+        // 205. Начинаем реализацию метода CheckOutHandler в CarDetails
+        try
+        {
+            var paymentDTO = new StripePaymentDTO()
+                {
+                    Amount = Convert.ToInt32(carBookingVM.OrderDetails.TeslaCarDTO.TotalAmount * 100),
+                    // --> На этом этапе перейти в StripePaymentController и в методе Create, удалить умножение на 100
+                    ProductName = carBookingVM.OrderDetails.TeslaCarDTO.Name,
+                    ReturnUrl = $"/car/car-details/{CarId}"
+                };
+
+                var result = await _stripeService.CheckOut(paymentDTO);
+
+                carBookingVM.OrderDetails.StripeSessionId = result.Data.ToString();
+                carBookingVM.OrderDetails.CarId = carBookingVM.OrderDetails.TeslaCarDTO.Id;
+                carBookingVM.OrderDetails.TotalCost = carBookingVM.OrderDetails.TeslaCarDTO.TotalAmount;
+
+                var carOrderDetailsSaved = await _carOrderDetailsService.SaveCarOrderDetails(carBookingVM.OrderDetails);
+
+                // На этом этапе вводим новую константу для сохранения деталей заказа в локальное хранилище браузера пользователей LOCAL_CAR_ORDER_DETAILS
+                await _localStorage.SetItemAsync(SD.LOCAL_CAR_ORDER_DETAILS, carOrderDetailsSaved);
+
+                await _js.InvokeVoidAsync("redirectToCheckout", result.Data.ToString());
+
+        }
+        catch (Exception ex)
+        {
+            await _js.ToastrError(ex.Message);
+        }
 
 
     }
