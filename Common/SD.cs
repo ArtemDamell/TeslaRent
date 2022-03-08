@@ -17,5 +17,9 @@ namespace Common
         public const string LOCAL_INITIALBOOKING = "InitialBookingInfo";
 
         public const string LOCAL_CAR_ORDER_DETAILS = "InitialCarBookingInfo";
+        public const string LOCAL_TOKEN = "JWT Token";
+
+        // 229.2 Добавить константу для информации о пользователе
+        public const string LOCAL_USER_DETAILS = "User Details";
     }
 }

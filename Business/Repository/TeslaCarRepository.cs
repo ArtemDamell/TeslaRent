@@ -7,222 +7,268 @@ using System.Diagnostics;
 
 namespace Business.Repository
 {
-	// 19. Создаём класс реализации интерфейса
-	public class TeslaCarRepository : ITeslaCarRepository
-	{
-		// 19.1 Внедряем зависимость базы данных через конструктор класса
-		private readonly ApplicationDbContext _db;
+    // 19. Создаём класс реализации интерфейса
+    public class TeslaCarRepository : ITeslaCarRepository
+    {
+        // 19.1 Внедряем зависимость базы данных через конструктор класса
+        private readonly ApplicationDbContext _db;
 
-		// 24. Внедряем зависимость AutoMapper
-		private readonly IMapper _mapper;
+        // 24. Внедряем зависимость AutoMapper
+        private readonly IMapper _mapper;
 
-		public TeslaCarRepository(ApplicationDbContext db, IMapper mapper)
-		{
-			_mapper = mapper;
-			_db = db;
-		}
+        public TeslaCarRepository(ApplicationDbContext db, IMapper mapper)
+        {
+            _mapper = mapper;
+            _db = db;
+        }
 
-		public async Task<TeslaCarDTO> CreateCar(TeslaCarDTO carForCreation)
-		{
-			try
-			{
-				// 24.1 Конвертируем с помощью AutoMapper модель DTO в обычную
-				TeslaCar car = _mapper.Map<TeslaCarDTO, TeslaCar>(carForCreation);
+        public async Task<TeslaCarDTO> CreateCar(TeslaCarDTO carForCreation)
+        {
+            try
+            {
+                // 24.1 Конвертируем с помощью AutoMapper модель DTO в обычную
+                TeslaCar car = _mapper.Map<TeslaCarDTO, TeslaCar>(carForCreation);
 
-				//var temp = car.CarAccessories.ToList();
-				//car.CarAccessories.Clear();
+                //var temp = car.CarAccessories.ToList();
+                //car.CarAccessories.Clear();
 
-				// 24.2 Добавляем в модель недостающие данные
-				car.CreatedDate = DateTime.UtcNow;
-				car.CreatedBy = "";
+                // 24.2 Добавляем в модель недостающие данные
+                car.CreatedDate = DateTime.UtcNow;
+                car.CreatedBy = "";
 
 
-				// 19.2
-				/*
+                // 19.2
+                /*
 				 * Добавляем реализацию метода, которая приведёт к ошибки
 				 * т.к. мы пытаемся сохранить через модель объект DTO
 				 * Для того, чтобы исправить эту проблему, мы будем использовать
 				 * библиотеку AutoMapper
 				*/
-				//var addedCar = _db.TeslaCars.Add(carForCreation);
-				// --> На этом этапе идём реализовывать функционал AutoMapper Profile
+                //var addedCar = _db.TeslaCars.Add(carForCreation);
+                // --> На этом этапе идём реализовывать функционал AutoMapper Profile
 
-				// 24.3 Добавляем объект в сущности Entity
-				var addedCar = _db.TeslaCars.Add(car);
+                // 24.3 Добавляем объект в сущности Entity
+                var addedCar = _db.TeslaCars.Add(car);
 
-				// 24.4 Сохраняем на основе добавленых сущьностей изменения в базе данных
-				await _db.SaveChangesAsync();
+                // 24.4 Сохраняем на основе добавленых сущьностей изменения в базе данных
+                await _db.SaveChangesAsync();
 
-				//temp.ForEach(x =>
-				//{
-				//	car.CarAccessories.Add(x);
-				//});
+                //temp.ForEach(x =>
+                //{
+                //	car.CarAccessories.Add(x);
+                //});
 
-				//_db.TeslaCars.Update(car);
-				await _db.SaveChangesAsync();
+                //_db.TeslaCars.Update(car);
+                await _db.SaveChangesAsync();
 
-				return _mapper.Map<TeslaCar, TeslaCarDTO>(addedCar.Entity);
-			}
-			catch (Exception ex)
-			{
-				throw ex;
-			}
+                return _mapper.Map<TeslaCar, TeslaCarDTO>(addedCar.Entity);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
 
-			
-			// --> Далее, реализовываем остальные методы
-		}
 
-		public async Task<int> DeleteCar(int carId)
-		{
-			var carDetails = await _db.TeslaCars.FindAsync(carId);
+            // --> Далее, реализовываем остальные методы
+        }
 
-			if (carDetails is not null)
-			{
-				// 78. Получаем все картинки для удаления и удаляем их
-				var allImages = await _db.TeslaCarImages.Where(x => x.CarId == carId).ToListAsync();
-				_db.TeslaCarImages.RemoveRange(allImages);
+        public async Task<int> DeleteCar(int carId)
+        {
+            var carDetails = await _db.TeslaCars.FindAsync(carId);
 
-				_db.TeslaCars.Remove(carDetails);
-				return await _db.SaveChangesAsync();
-			}
-			return 0;
-		}
+            if (carDetails is not null)
+            {
+                // 78. Получаем все картинки для удаления и удаляем их
+                var allImages = await _db.TeslaCarImages.Where(x => x.CarId == carId).ToListAsync();
+                _db.TeslaCarImages.RemoveRange(allImages);
 
-		// 167.1 Обновить методы в TeslaCarRepository
-		public async Task<IEnumerable<TeslaCarDTO>> GetAllCars(string? startRentDate = null, string? endRentDate = null)
-		{
-			/* 
+                _db.TeslaCars.Remove(carDetails);
+                return await _db.SaveChangesAsync();
+            }
+            return 0;
+        }
+
+        // 167.1 Обновить методы в TeslaCarRepository
+        public async Task<IEnumerable<TeslaCarDTO>> GetAllCars(string? startRentDate = null, string? endRentDate = null)
+        {
+            /* 
 			 * Т.к. логика может вызвать разнообразные ошибки и обвалить
 			 * Приложение, далее будем по возможности использовать конструкцию
 			 * try/catch
 			 */
-			try
-			{
-				IEnumerable<TeslaCarDTO> teslaCarDTOs =
-					_mapper.Map<IEnumerable<TeslaCar>, IEnumerable<TeslaCarDTO>>(await _db.TeslaCars.Include(x => x.TeslaCarImages).ToListAsync());
+            try
+            {
+                IEnumerable<TeslaCarDTO> teslaCarDTOs =
+                    _mapper.Map<IEnumerable<TeslaCar>, IEnumerable<TeslaCarDTO>>(await _db.TeslaCars.Include(x => x.TeslaCarImages).ToListAsync());
 
-				return teslaCarDTOs;
-			}
-			catch (Exception ex)
-			{
-				Debug.WriteLine(ex.Message);
-				return null;
-			}
-		}
+                // 219.3 Далее копируем логику в метод GetAllCars
+                if (!string.IsNullOrWhiteSpace(startRentDate) && !string.IsNullOrWhiteSpace(endRentDate))
+                {
+                    foreach (var car in teslaCarDTOs)
+                    {
+                        car.IsBooked = await IsCarBookedAsync(car.Id, startRentDate, endRentDate);
+                    }
+                }
 
-		// 167.2 Обновить методы в TeslaCarRepository
-		public async Task<TeslaCarDTO> GetCar(int carId, string? startRentDate = null, string? endRentDate = null)
-		{
-			try
-			{
-				//TeslaCarDTO car = _mapper.Map<TeslaCar, TeslaCarDTO>(
-				//	await _db.TeslaCars/*.AsNoTracking()*/.Include(x => x.CarAccessories).FirstOrDefaultAsync(x => x.Id == carId));
-				// Получаем машину из базы с подключённой таблицей
-				var car = await _db.TeslaCars.Include(x => x.TeslaCarImages).FirstOrDefaultAsync(x => x.Id == carId);
-				// Перегоняем в DTO
-				var carDTO = _mapper.Map<TeslaCar, TeslaCarDTO>(car);
+                return teslaCarDTOs;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
 
-				return carDTO;
-			}
-			catch (Exception ex)
-			{
-				Debug.WriteLine(ex.Message);
-				return null;
-			}
-		}
+        // 167.2 Обновить методы в TeslaCarRepository
+        public async Task<TeslaCarDTO> GetCar(int carId, string? startRentDate = null, string? endRentDate = null)
+        {
+            try
+            {
+                //TeslaCarDTO car = _mapper.Map<TeslaCar, TeslaCarDTO>(
+                //	await _db.TeslaCars/*.AsNoTracking()*/.Include(x => x.CarAccessories).FirstOrDefaultAsync(x => x.Id == carId));
+                // Получаем машину из базы с подключённой таблицей
+                var car = await _db.TeslaCars.Include(x => x.TeslaCarImages).FirstOrDefaultAsync(x => x.Id == carId);
+                // Перегоняем в DTO
+                var carDTO = _mapper.Map<TeslaCar, TeslaCarDTO>(car);
 
-		// 49.2 Добавляем параметр int carId = 0
-		public async Task<TeslaCarDTO> IsCarUnique(string carName, int carId = 0)
-		{
-			try
-			{
-				// 49.3 Проверяем, если Id равен 0, то мы создаём а не редактируем
-				if (carId.Equals(0))
-				{
-					TeslaCarDTO car = _mapper.Map<TeslaCar, TeslaCarDTO>(
-					await _db.TeslaCars.FirstOrDefaultAsync(x => x.Name.ToLower() == carName.ToLower()));
+                // 219.2 Далее в TeslaCarRepository в методе GetCar
+                // Далее копируем логику в метод GetAllCars
+                if (!string.IsNullOrWhiteSpace(startRentDate) && !string.IsNullOrWhiteSpace(endRentDate))
+                    carDTO.IsBooked = await IsCarBookedAsync(carId, startRentDate, endRentDate);
 
-					return car;
-				}
-				else
-				{
-					TeslaCarDTO car = _mapper.Map<TeslaCar, TeslaCarDTO>(
-					await _db.TeslaCars.FirstOrDefaultAsync(x => x.Name.ToLower() == carName.ToLower()
-					&& !x.Id.Equals(carId)));
+                return carDTO;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
 
-					return car;
-				}
-				// ***************************************************************
+        // 49.2 Добавляем параметр int carId = 0
+        public async Task<TeslaCarDTO> IsCarUnique(string carName, int carId = 0)
+        {
+            try
+            {
+                // 49.3 Проверяем, если Id равен 0, то мы создаём а не редактируем
+                if (carId.Equals(0))
+                {
+                    TeslaCarDTO car = _mapper.Map<TeslaCar, TeslaCarDTO>(
+                    await _db.TeslaCars.FirstOrDefaultAsync(x => x.Name.ToLower() == carName.ToLower()));
 
-				//TeslaCarDTO car = _mapper.Map<TeslaCar, TeslaCarDTO>(
-				//    await _db.TeslaCars.FirstOrDefaultAsync(x => x.Name.ToLower() == carName.ToLower()));
+                    return car;
+                }
+                else
+                {
+                    TeslaCarDTO car = _mapper.Map<TeslaCar, TeslaCarDTO>(
+                    await _db.TeslaCars.FirstOrDefaultAsync(x => x.Name.ToLower() == carName.ToLower()
+                    && !x.Id.Equals(carId)));
 
-				//return car;
-			}
-			catch (Exception ex)
-			{
-				Debug.WriteLine(ex.Message);
-				return null;
-			}
-		}
+                    return car;
+                }
+                // ***************************************************************
 
-		public async Task<TeslaCarDTO> UpdateCar(int carId, TeslaCarDTO carForUpdating)
-		{
-			try
-			{
-				if (carId == carForUpdating.Id)
-				{
-					// Получаем данные из базы
-					var carDetailsFromDb = await _db.TeslaCars.Include(x => x.TeslaCarImages).FirstOrDefaultAsync(x => x.Id == carId);
+                //TeslaCarDTO car = _mapper.Map<TeslaCar, TeslaCarDTO>(
+                //    await _db.TeslaCars.FirstOrDefaultAsync(x => x.Name.ToLower() == carName.ToLower()));
 
-					// Clear DB Accessories
-					//carDetailsFromDb.CarAccessories.Clear();
-					//var entity = _db.Update(carDetailsFromDb);
-					//await _db.SaveChangesAsync();
+                //return car;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
 
-					// Конвертируем полученные данные из DTO в обычную модель для сохранения в базе
-					var car = _mapper.Map<TeslaCarDTO, TeslaCar>(carForUpdating, carDetailsFromDb);
+        public async Task<TeslaCarDTO> UpdateCar(int carId, TeslaCarDTO carForUpdating)
+        {
+            try
+            {
+                if (carId == carForUpdating.Id)
+                {
+                    // Получаем данные из базы
+                    var carDetailsFromDb = await _db.TeslaCars.Include(x => x.TeslaCarImages).FirstOrDefaultAsync(x => x.Id == carId);
 
-					// Добавляем недостающие свойства
-					car.UpdatedBy = "";
-					car.UpdatedDate = DateTime.UtcNow;
+                    // Clear DB Accessories
+                    //carDetailsFromDb.CarAccessories.Clear();
+                    //var entity = _db.Update(carDetailsFromDb);
+                    //await _db.SaveChangesAsync();
 
-					// Обновляем данные в сущностях Entity
-					var updatedCar = _db.Update(car);
+                    // Конвертируем полученные данные из DTO в обычную модель для сохранения в базе
+                    var car = _mapper.Map<TeslaCarDTO, TeslaCar>(carForUpdating, carDetailsFromDb);
 
-					// Сохраняем изменения в базе данных
-					await _db.SaveChangesAsync();
+                    // Добавляем недостающие свойства
+                    car.UpdatedBy = "";
+                    car.UpdatedDate = DateTime.UtcNow;
 
-					var result = _mapper.Map<TeslaCar, TeslaCarDTO>(car);
-					return result;
-				}
-				else
-				{
-					return null;
-				}
-			}
-			catch (Exception ex)
-			{
-				Debug.WriteLine(ex.Message);
-				return null;
-			}
-		}
+                    // Обновляем данные в сущностях Entity
+                    var updatedCar = _db.Update(car);
 
-		public async Task<IEnumerable<CarAccessoryDTO>> GetAllCarAccessories() 
-		{
-			var allAccessories = _mapper.Map<IEnumerable<CarAccessory>, IEnumerable<CarAccessoryDTO>>(await _db.CarAccessories.AsNoTracking().ToListAsync());
-			return allAccessories;
-		}
+                    // Сохраняем изменения в базе данных
+                    await _db.SaveChangesAsync();
 
-		public async Task<CarAccessoryDTO> GetSingleAccessory(int id)
-		{
-			var accessory = _mapper.Map<CarAccessory, CarAccessoryDTO>(await _db.CarAccessories.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id));
-			return accessory;
-		}
+                    var result = _mapper.Map<TeslaCar, TeslaCarDTO>(car);
+                    return result;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
 
-		public async Task<CarAccessory> GetAccessory(int id)
-		{
-			return await _db.CarAccessories.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
-		}
-	}
+        public async Task<IEnumerable<CarAccessoryDTO>> GetAllCarAccessories()
+        {
+            var allAccessories = _mapper.Map<IEnumerable<CarAccessory>, IEnumerable<CarAccessoryDTO>>(await _db.CarAccessories.AsNoTracking().ToListAsync());
+            return allAccessories;
+        }
+
+        public async Task<CarAccessoryDTO> GetSingleAccessory(int id)
+        {
+            var accessory = _mapper.Map<CarAccessory, CarAccessoryDTO>(await _db.CarAccessories.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id));
+            return accessory;
+        }
+
+        public async Task<CarAccessory> GetAccessory(int id)
+        {
+            return await _db.CarAccessories.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        // 217.2 Перенести метод IsCarBookedAsync из CarOrderDetailsRepository в TeslaCarRepository
+        // 218. Изменить метод IsCarBookedAsync
+        public async Task<bool> IsCarBookedAsync(int carId, string startRentDateString, string endRentDateString)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(startRentDateString) && !string.IsNullOrWhiteSpace(endRentDateString))
+                {
+                    var startRentDate = DateTime.ParseExact(startRentDateString, "MM.dd.yyyy", null);
+                    var endRentDate = DateTime.ParseExact(endRentDateString, "MM.dd.yyyy", null);
+
+                    var existingBooking = await _db.CarOrderDetails.Where(x =>
+                                                                                     x.CarId == carId &&
+                                                                                     x.IsPaymentSuccessful &&
+                                                                                     ((startRentDate < x.EndRentDate && endRentDate.Date >= x.StartRentDate) ||
+                                                                                     (endRentDate.Date > x.StartRentDate.Date && startRentDate.Date <= x.StartRentDate.Date)))
+                                                                                     .FirstOrDefaultAsync();
+
+                    if (existingBooking is not null)
+                        return true;
+
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
+    }
 }

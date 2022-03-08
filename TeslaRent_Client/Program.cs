@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using TeslaRent_Client;
@@ -16,6 +17,11 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 // 158. Внедрить зависимость в класс Program проекта TeslaRent_Client
 builder.Services.AddBlazoredLocalStorage();
 
+// 223. Перейти в класс Program клиентского проекта и внедрить функционал AuthStateProvider'a
+builder.Services.AddAuthorizationCore();
+builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
+
+
 builder.Services.AddScoped<ICarService, CarService>();
 
 // 186. Регистрируем новый сервис в классе Program TeslaRent_Client
@@ -23,5 +29,8 @@ builder.Services.AddScoped<ICarOrderDetailsService, CarOrderDetailsService>();
 
 // 204. Сконфигурировать зависимость сервиса IStripePaymentService в классе Program проекта Client
 builder.Services.AddScoped<IStripePaymentService, StripePaymentService>();
+
+// 231. Добавить AuthenticationService в класс Program проекта Client
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
 await builder.Build().RunAsync();

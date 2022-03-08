@@ -17,9 +17,28 @@ namespace TeslaRent_Client.Services
         }
 
         // 185.4 Эти 2 метода пропускаем и реализуем их позже
-        public Task<CarOrderDetailsDTO> MarkPaymentSuccessful(CarOrderDetailsDTO details)
+        public async Task<CarOrderDetailsDTO> MarkPaymentSuccessful(CarOrderDetailsDTO details)
         {
-            throw new NotImplementedException();
+            //213.Переходим в CarOrderDetailsService и реализовываем метод MarkPaymentSuccessful
+            //throw new NotImplementedException();
+
+            var content = JsonConvert.SerializeObject(details);
+            var bodyContent = new StringContent(content, Encoding.UTF8, "application/json");
+            var response = await _client.PostAsync("api/carorder/paymentsuccessful", bodyContent);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var tempContent = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<CarOrderDetailsDTO>(tempContent);
+                return result;
+            }
+            else
+            {
+                var tempContent = await response.Content.ReadAsStringAsync();
+                var error = JsonConvert.DeserializeObject<ErrorModel>(tempContent);
+                Exception exception = new(error?.ErrorMessage);
+                throw exception;
+            }
         }
 
         public async Task<CarOrderDetailsDTO> SaveCarOrderDetails(CarOrderDetailsDTO details)
@@ -45,7 +64,8 @@ namespace TeslaRent_Client.Services
             {
                 var tempContent = await response.Content.ReadAsStringAsync();
                 var error = JsonConvert.DeserializeObject<ErrorModel>(tempContent);
-                throw new Exception(error.ErrorMessage);
+                Exception exception = new(error?.ErrorMessage);
+                throw exception;
             }
         }
     }

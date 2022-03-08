@@ -36,5 +36,37 @@ namespace TeslaCar_API.Controllers
                 });
             }
         }
+
+        // 214. Реализовать новый метод в CarOrderController
+        [HttpPost]
+        public async Task<IActionResult> PaymentSuccessful([FromBody] CarOrderDetailsDTO details)
+        {
+            var service = new Stripe.Checkout.SessionService();
+            var sessionDetails = service.Get(details.StripeSessionId);
+
+            if (sessionDetails.PaymentStatus.Equals("paid"))
+            {
+                var result = await _repository.MarkPaymentSuccessfulAsync(details.Id);
+                if (result is null)
+                {
+                    return BadRequest(new ErrorModel()
+                    {
+                        ErrorMessage = "Can not mark payment as successful",
+                        StatusCode = 400,
+                        Title = "Mark as successful fail"
+                    });
+                }
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(new ErrorModel()
+                {
+                    ErrorMessage = "Can not mark payment as successful",
+                    StatusCode = 400,
+                    Title = "Mark as successful fail"
+                });
+            }
+        }
     }
 }

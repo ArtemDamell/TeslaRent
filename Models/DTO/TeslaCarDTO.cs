@@ -31,5 +31,9 @@ namespace Models
 
         // 86. Домашнее задание
         public virtual ICollection<CarAccessoryDTO>? CarAccessories { get; set; }
+
+        // 219.1 Добавить в модель TeslaCarDTO новое свойство, bool IsBooked
+        // Далее в TeslaCarRepository в методе GetCar
+        public bool IsBooked { get; set; }
     }
 }

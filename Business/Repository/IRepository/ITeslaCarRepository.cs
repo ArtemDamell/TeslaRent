@@ -18,5 +18,7 @@ namespace Business.Repository.IRepository
         Task<TeslaCarDTO> IsCarUnique(string carName, int carId = 0);
         Task<IEnumerable<CarAccessoryDTO>> GetAllCarAccessories();
         Task<CarAccessoryDTO> GetSingleAccessory(int id);
+        // 217.4 Перенести метод IsCarBookedAsync из CarOrderDetailsRepository в TeslaCarRepository
+        Task<bool> IsCarBookedAsync(int carId, string startRentDate, string endRentDate);
     }
 }

@@ -90,27 +90,41 @@ namespace Business.Repository
             }
         }
 
-        public async Task<bool> IsCarBookedAsync(int carId, DateTime startRentDate, DateTime endRentDate)
-        {
-            var bookingStatus = false;
-            var existingBooking = await _db.CarOrderDetails.Where(x => 
-                                                                                     x.CarId == carId &&
-                                                                                     x.IsPaymentSuccessful &&
-                                                                                     startRentDate < x.EndRentDate &&
-                                                                                     endRentDate.Date > x.StartRentDate ||
-                                                                                     endRentDate.Date > x.StartRentDate.Date &&
-                                                                                     startRentDate.Date < x.StartRentDate.Date).FirstOrDefaultAsync();
+        // 217.1 Перенести метод IsCarBookedAsync из CarOrderDetailsRepository в TeslaCarRepository
+        //public async Task<bool> IsCarBookedAsync(int carId, DateTime startRentDate, DateTime endRentDate)
+        //{
+        //    var bookingStatus = false;
+        //    var existingBooking = await _db.CarOrderDetails.Where(x => 
+        //                                                                             x.CarId == carId &&
+        //                                                                             x.IsPaymentSuccessful &&
+        //                                                                             startRentDate < x.EndRentDate &&
+        //                                                                             endRentDate.Date > x.StartRentDate ||
+        //                                                                             endRentDate.Date > x.StartRentDate.Date &&
+        //                                                                             startRentDate.Date < x.StartRentDate.Date).FirstOrDefaultAsync();
 
-            if (existingBooking is not null)
-                bookingStatus = true;
+        //    if (existingBooking is not null)
+        //        bookingStatus = true;
 
-            return bookingStatus;
-        }
+        //    return bookingStatus;
+        //}
 
         // Эти 2 метода реализуем позже, не на шаге 183!
-        public Task<CarOrderDetailsDTO> MarkPaymentSuccessfulAsync(int id)
+        public async Task<CarOrderDetailsDTO> MarkPaymentSuccessfulAsync(int id)
         {
-            throw new NotImplementedException();
+            // 215. Реализовать метод MarkPaymentSuccessfulAsync в CarOrderDetailsRepository
+            var data = await _db.CarOrderDetails.FindAsync(id);
+            if (data is null)
+                return null;
+            if (!data.IsPaymentSuccessful)
+            {
+                data.IsPaymentSuccessful = true;
+                data.Status = Status.Booked;
+                var updated = _db.CarOrderDetails.Update(data);
+                await _db.SaveChangesAsync();
+
+                return _mapper.Map<CarOrderDetails, CarOrderDetailsDTO>(updated.Entity);
+            }
+            return new CarOrderDetailsDTO();
         }
 
         public Task<bool> UpdateOrderStatusAsync(int carDetailsId, Status status)

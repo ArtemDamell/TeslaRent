@@ -16,6 +16,7 @@ namespace Business.Repository.IRepository
         Task<CarOrderDetailsDTO> GetCarOrderDetailsAsync(int carOrderId);
         Task<IEnumerable<CarOrderDetailsDTO>> GetAllCarOrderDetailsAsync();
         Task<bool> UpdateOrderStatusAsync(int carDetailsId, Status status);
-        Task<bool> IsCarBookedAsync(int carId, DateTime startRentDate, DateTime endRentDate);
+        // 217.3 Перенести метод IsCarBookedAsync из CarOrderDetailsRepository в TeslaCarRepository
+        //Task<bool> IsCarBookedAsync(int carId, DateTime startRentDate, DateTime endRentDate);
     }
 }

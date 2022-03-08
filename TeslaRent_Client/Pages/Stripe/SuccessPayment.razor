@@ -1,0 +1,47 @@
+﻿@*212. В проекте Client в дериктории Pages создать новую папку Stripe, в ней новый компонент SuccessPayment*@
+@page "/success-payment"
+@using Models.DTO
+
+@inject ILocalStorageService _localStorage
+@inject ICarOrderDetailsService _carOrderService
+
+@if (!isPaymentComplete)
+{
+    <div class="text-center">
+        <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/2796ed81999693.5d10c0872415e.gif" />
+    </div>
+}
+else
+{
+    <div class="container">
+        <div class="row mt-4 pt-4">
+            <div class="col-10 offset-1 text-center mb-3" style="background-color: #ffffffe6; border-radius: 30px;">
+                <h1 class="text-success">Booking Confirmed</h1>
+                <p>Your car has been booked successfully with order id: @orderId</p>
+            </div>
+            <div class="col-8 offset-2">
+                <img src="https://thumbs.dreamstime.com/b/grunge-textured-reservation-confirmed-stamp-seal-reservation-confirmed-stamp-seal-imprint-grunge-texture-designed-130898475.jpg" style="border-radius: 30px; width: 100%;" />
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    bool isPaymentComplete;
+    int orderId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var orderDetails = await _localStorage.GetItemAsync<CarOrderDetailsDTO>(SD.LOCAL_CAR_ORDER_DETAILS);
+        orderId = orderDetails.Id;
+
+        var finalOrderDetails = await _carOrderService.MarkPaymentSuccessful(orderDetails);
+        if (finalOrderDetails.Status.Equals(Status.Booked))
+        {
+            await _localStorage.RemoveItemAsync(SD.LOCAL_CAR_ORDER_DETAILS);
+            await _localStorage.RemoveItemAsync(SD.LOCAL_INITIALBOOKING);
+            isPaymentComplete = true;
+        }
+    }
+}

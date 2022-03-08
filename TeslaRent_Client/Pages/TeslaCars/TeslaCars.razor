@@ -117,7 +117,16 @@
                         <div class="col-12 col-lg-4">
                             <div class="row pb-3 pt-2">
                                 <div class="col-12 col-lg-11">
-                                    <a href="@($"car/car-details/{item.Id}")" class="btn btn-success btn-block">Book</a>
+                                    @*220.1 Добавить в компонент TeslaCars логику нового флага к кнопке Details*@
+                                    @if (item.IsBooked)
+                                    {
+                                        <button disabled class="btn btn-secondary btn-block">Sold Out</button>
+                                    }
+                                    else
+                                    {
+                                        <NavLink href="@($"car/car-details/{item.Id}")" class="btn btn-success btn-block">Book</NavLink>
+                                    }
+                                    @*После этого делаем подобную логику в компоненте CarDetails*@
                                 </div>
                             </div>
                             <div class="row">

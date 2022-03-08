@@ -12,6 +12,7 @@ namespace TeslaCar_API.Controllers
     {
         // 198. Переходим к реализации StripePaymentController
         private readonly IConfiguration _configuration;
+
         public StripePaymentController(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -62,15 +63,13 @@ namespace TeslaCar_API.Controllers
             }
             catch (Exception ex)
             {
-
                 return BadRequest(new ErrorModel()
                 {
                     ErrorMessage = ex.Message,
                     StatusCode = 400,
-                    Title="Create Payment failed"
+                    Title = "Create Payment failed"
                 });
             }
-            
         }
     }
 }

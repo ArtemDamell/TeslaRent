@@ -39,7 +39,7 @@ namespace Models.DTO
         public string Phone { get; set; }
 
         [ForeignKey(nameof(CarId))]
-        public TeslaCarDTO TeslaCarDTO { get; set; }
+        public TeslaCarDTO? TeslaCarDTO { get; set; }
         public Status Status { get; set; }
     }
 }

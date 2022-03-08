@@ -141,7 +141,15 @@ else
                         </div>
 
                         <div class="form-group mt-3">
-                            <button type="submit" class="btn btn-success form-control">Checkout now</button>
+                            @* 220.2 После этого делаем подобную логику в компоненте CarDetails*@
+                            @if (carBookingVM.OrderDetails.TeslaCarDTO.IsBooked)
+                            {
+                                <button class="btn btn-secondary form-control" disabled>Sold Out</button>
+                            }
+                            else
+                            {
+                                <button type="submit" class="btn btn-success form-control">Checkout now</button>
+                            }
                         </div>
 
                     </div>

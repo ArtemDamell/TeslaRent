@@ -1,0 +1,108 @@
+﻿@*232. Добавить в проект Client в папку Pages новую папку Authentication, в неё компонент Register*@
+@page "/registration"
+
+@inject IAuthenticationService _authService
+@inject NavigationManager _navManager
+
+<EditForm Model="UserForRegistration" OnValidSubmit="RegisterUserHandler" class="pt-4">
+    <DataAnnotationsValidator />
+    <div class="py-4">
+        <div class="row form-group mx-0">
+            <div class="col-sm-12 col-md-6 offset-md-3">
+                <div class="card border">
+                    <div class="card-body px-lg-5 pt-4">
+                        <h1 class="col-12 text-info text-center py-2">
+                            <strong>Sign Up</strong>
+                        </h1>
+
+                        @if (ShowRegistrationErrors)
+                        {
+                            <div class="alert alert-danger text-center">
+                                @foreach (var item in Errors)
+                                {
+                                    <p class="fw-bolder">@item</p>
+                                }
+                            </div>
+                        }
+
+                        <hr style="background-color: aliceblue" />
+                        <div class="py-2">
+                            <InputText @bind-Value="UserForRegistration.FirstName" class="form-control" placeholder="First Name ..." />
+                            <ValidationMessage For="(() => UserForRegistration.FirstName)" />
+                        </div>
+
+                        <div class="py-2">
+                            <InputText @bind-Value="UserForRegistration.LastName" class="form-control" placeholder="Last Name ..." />
+                            <ValidationMessage For="(() => UserForRegistration.LastName)" />
+                        </div>
+
+                        <div class="py-2">
+                            <InputText @bind-Value="UserForRegistration.Email" class="form-control" placeholder="Email ..." />
+                            <ValidationMessage For="(() => UserForRegistration.Email)" />
+                        </div>
+
+                        <div class="py-2 input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">+358</span>
+                            </div>
+                            <InputText @bind-Value="UserForRegistration.Phone" class="form-control" placeholder="Phone Number ..." />
+                            <ValidationMessage For="(() => UserForRegistration.Phone)" />
+                        </div>
+
+                        <div class="form-row py-2">
+                            <div class="col">
+                                <InputText @bind-Value="UserForRegistration.Password" class="form-control" placeholder="Password ..." type="password" />
+                                <ValidationMessage For="(() => UserForRegistration.Password)" />
+                            </div>
+                            <div class="col pt-3">
+                                <InputText @bind-Value="UserForRegistration.ConfirmPassword" class="form-control" placeholder="Confirm Password ..." type="password" />
+                                <ValidationMessage For="(() => UserForRegistration.ConfirmPassword)" />
+                            </div>
+                        </div>
+
+                        <hr style="background-color: aliceblue" />
+
+                        <div class="py-2">
+                            @if (IsProcessing)
+                            {
+                                <button class="btn btn-outline-success btn-block" disabled><i class="fa-solid fa-snowflake"></i> Please, wait ...</button>
+                            }
+                            else
+                            {
+                                <button type="submit" class="btn btn-outline-success btn-block"><i class="fa-solid fa-user-plus"></i> Register</button>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    public bool IsProcessing { get; set; }
+    public bool ShowRegistrationErrors { get; set; }
+    public IEnumerable<string>? Errors { get; set; }
+
+    UserRequestDTO UserForRegistration = new();
+
+    async Task RegisterUserHandler()
+    {
+        ShowRegistrationErrors = false;
+        IsProcessing = true;
+
+        var result = await _authService.RegisterUser(UserForRegistration);
+        if (result.IsRegistrationSuccessful)
+        {
+            IsProcessing = false;
+            _navManager.NavigateTo("/login");
+        }
+        else
+        {
+            IsProcessing = false;
+            Errors = result.Errors;
+            ShowRegistrationErrors = true;
+        }
+    }
+}
