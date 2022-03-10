@@ -1,8 +1,8 @@
 ﻿@*232. Добавить в проект Client в папку Pages новую папку Authentication, в неё компонент Register*@
 @page "/registration"
 
-@inject IAuthenticationService _authService
-@inject NavigationManager _navManager
+@*@inject IAuthenticationService _authService
+@inject NavigationManager _navManager*@
 
 <EditForm Model="UserForRegistration" OnValidSubmit="RegisterUserHandler" class="pt-4">
     <DataAnnotationsValidator />
@@ -80,7 +80,7 @@
     </div>
 </EditForm>
 
-@code {
+@*@code {
     public bool IsProcessing { get; set; }
     public bool ShowRegistrationErrors { get; set; }
     public IEnumerable<string>? Errors { get; set; }
@@ -105,4 +105,4 @@
             ShowRegistrationErrors = true;
         }
     }
-}
+}*@

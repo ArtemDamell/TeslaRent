@@ -1,5 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using Common;
+using Microsoft.AspNetCore.Components.Authorization;
 using Models;
 using Newtonsoft.Json;
 using System.Text;
@@ -13,10 +14,15 @@ namespace TeslaRent_Client.Services
         private readonly HttpClient _client;
         private readonly ILocalStorageService _localStorage;
 
-        public AuthenticationService(HttpClient client, ILocalStorageService localStorage)
+        // 239.1 Вносим изменения в AuthenticationService для использования новых методов
+        private readonly AuthenticationStateProvider _authStatePrivider;
+
+
+        public AuthenticationService(HttpClient client, ILocalStorageService localStorage, AuthenticationStateProvider authStatePrivider)
         {
             _client = client;
             _localStorage = localStorage;
+            _authStatePrivider = authStatePrivider;
         }
         public async Task<AuthenticationResponseDTO> Login(AuthenticationRequestDTO userAuthInfo)
         {
@@ -31,6 +37,10 @@ namespace TeslaRent_Client.Services
             {
                 await _localStorage.SetItemAsync(SD.LOCAL_TOKEN, result.Token);
                 await _localStorage.SetItemAsync(SD.LOCAL_USER_DETAILS, result.User);
+
+                // 239.3/.3 Вносим изменения в AuthenticationService для использования новых методов
+                ((AuthStateProvider)_authStatePrivider).NotifyUserLoggedIn(result.Token);
+
                 _client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", result.Token);
                 return new AuthenticationResponseDTO { IsAuthSuccessful = true };
             }
@@ -43,6 +53,10 @@ namespace TeslaRent_Client.Services
         {
             await _localStorage.RemoveItemAsync(SD.LOCAL_TOKEN);
             await _localStorage.RemoveItemAsync(SD.LOCAL_USER_DETAILS);
+
+            // 239.2 Вносим изменения в AuthenticationService для использования новых методов
+            ((AuthStateProvider)_authStatePrivider).NotifyUserLogout();
+
             _client.DefaultRequestHeaders.Authorization = null;
         }
 

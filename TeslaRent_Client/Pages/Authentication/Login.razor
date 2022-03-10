@@ -1,7 +1,53 @@
 ﻿@*233. Добавить в проект Client в папку Authentication, в неё компонент Login*@
 @page "/login"
-<h3>Login</h3>
 
-@code {
+<EditForm Model="_authorizeInfo" OnValidSubmit="LoginUserHandler" class="pt-4">
+    <DataAnnotationsValidator />
+    <div class="py-4">
+        <div class="row form-group mx-0">
+            <div class="col-sm-12 col-md-6 offset-md-3">
+                <div class="card border">
+                    <div class="card-body px-lg-5 pt-4">
+                        <h1 class="col-12 text-info text-center py-2">
+                            <strong>Log In</strong>
+                        </h1>
 
-}
+                        @if (!string.IsNullOrWhiteSpace(Error))
+                        {
+                            <div class="alert alert-danger text-center">
+                                    <p class="fw-bolder">@Error</p>
+                            </div>
+                        }
+
+                        <hr style="background-color: aliceblue" />
+                        <div class="py-2">
+                            <InputText @bind-Value="_authorizeInfo.UserName" class="form-control" placeholder="Email ..." />
+                            <ValidationMessage For="(() => _authorizeInfo.UserName)" />
+                        </div>
+
+                        <div class="py-2">
+                            <InputText @bind-Value="_authorizeInfo.Password" type="password" class="form-control" placeholder="Password ..." />
+                            <ValidationMessage For="(() => _authorizeInfo.Password)" />
+                        </div>
+
+                        <hr style="background-color: aliceblue" />
+
+                        <div class="py-2">
+                            @if (IsProcessing)
+                            {
+                                <button class="btn btn-outline-success btn-block" disabled><i class="fa-solid fa-snowflake"></i> Please, wait ...</button>
+                            }
+                            else
+                            {
+                                <button type="submit" class="btn btn-outline-success btn-block"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+                            }
+
+                            <NavLink href="registration" class="btn btn-outline-primary btn-block mt-2"><i class="fa-solid fa-user-plus"></i> Register as a new user</NavLink>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>

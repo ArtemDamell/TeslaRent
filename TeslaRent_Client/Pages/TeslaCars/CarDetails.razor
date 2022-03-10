@@ -8,7 +8,9 @@
 @inject ICarService _carService
 @inject IStripePaymentService _stripeService
 @inject ICarOrderDetailsService _carOrderDetailsService
-
+@*240.1 Закрываем компонент CarDetails на атрибут авторизации*@
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = SD.CUSTOMER_ROLE)]
 @*191. Так, как по прежнему ошибка осталась, заключить в блок IF разметку компонента CarDetails*@
 @if (carBookingVM?.OrderDetails?.TeslaCarDTO?.TeslaCarImages is null)
 {
@@ -35,28 +37,28 @@ else
                     <div class="col-sm-12 col-md-6">
 
                         <!-- Carousel wrapper -->
-                    <div id="carouselBasicExample" class="carousel slide carousel-fade" data-mdb-ride="carousel">
+                        <div id="carouselBasicExample" class="carousel slide carousel-fade" data-mdb-ride="carousel">
                             <!-- Indicators -->
-                        <div class="carousel-indicators">
+                            <div class="carousel-indicators">
                                 <button type="button"
-                                    data-mdb-target="#carouselBasicExample"
-                                    data-mdb-slide-to="0"
-                                    class="active"
-                                    aria-current="true"
-                                    aria-label="Slide 1"></button>
+                                        data-mdb-target="#carouselBasicExample"
+                                        data-mdb-slide-to="0"
+                                        class="active"
+                                        aria-current="true"
+                                        aria-label="Slide 1"></button>
                             </div>
 
                             <!-- Inner -->
-                        <div class="carousel-inner">
+                            <div class="carousel-inner">
                                 <!-- Single item -->
-                            <div class="carousel-item active h-25">
+                                <div class="carousel-item active h-25">
                                     <img src="https://images.hdqwalls.com/wallpapers/tesla-model-3-2017-lf.jpg" class="d-block w-100" alt="Sunset Over the City" />
                                 </div>
 
 
                                 <!-- Inner -->
                                 <!-- Controls -->
-                            <button class="carousel-control-prev" type="button" data-mdb-target="#carouselBasicExample" data-mdb-slide="prev">
+                                <button class="carousel-control-prev" type="button" data-mdb-target="#carouselBasicExample" data-mdb-slide="prev">
                                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                     <span class="visually-hidden">Previous</span>
                                 </button>
@@ -68,7 +70,7 @@ else
                         </div>
                         <!-- Carousel wrapper -->
 
-                </div>
+                    </div>
 
                     <div class="col-sm-12 col-md-6">
                         <span class="float-md-end pt-4">
@@ -189,17 +191,31 @@ else
                     carBookingVM.OrderDetails.TeslaCarDTO.TotalDays = carInitializer.RentDays;
                     carBookingVM.OrderDetails.TeslaCarDTO.TotalAmount = carInitializer.RentDays * carBookingVM.OrderDetails.TeslaCarDTO.RegularRate;
                 }
-            }
-            else
-            {
-                carBookingVM.OrderDetails.TeslaCarDTO = await _carService.GetCarDetails(CarId.Value, DateTime.Now.ToString("MM.dd.yyyy"), DateTime.Now.AddDays(1).ToString("MM.dd.yyyy"));
-                DaysNumber = 1;
-                carBookingVM.OrderDetails.StartRentDate = DateTime.Now;
-                carBookingVM.OrderDetails.EndRentDate = DateTime.Now.AddDays(1);
-                carBookingVM.OrderDetails.TeslaCarDTO.TotalDays = 1;
-                carBookingVM.OrderDetails.TeslaCarDTO.TotalAmount = carBookingVM.OrderDetails.TeslaCarDTO.RegularRate;
+
+                else
+                {
+                    carBookingVM.OrderDetails.TeslaCarDTO = await _carService.GetCarDetails(CarId.Value, DateTime.Now.ToString("MM.dd.yyyy"), DateTime.Now.AddDays(1).ToString("MM.dd.yyyy"));
+                    DaysNumber = 1;
+                    carBookingVM.OrderDetails.StartRentDate = DateTime.Now;
+                    carBookingVM.OrderDetails.EndRentDate = DateTime.Now.AddDays(1);
+                    carBookingVM.OrderDetails.TeslaCarDTO.TotalDays = 1;
+                    carBookingVM.OrderDetails.TeslaCarDTO.TotalAmount = carBookingVM.OrderDetails.TeslaCarDTO.RegularRate;
+                }
             }
 
+            //241.1 Последний штрих данного модуля - автозаполнения деталей заказа в компоненте CarDetails и смена фейк пользователя на реального
+            if (await _localStorage.GetItemAsync<UserDTO>(SD.LOCAL_USER_DETAILS) is not null)
+            {
+                var userInfo = await _localStorage.GetItemAsync<UserDTO>(SD.LOCAL_USER_DETAILS);
+
+                carBookingVM.OrderDetails.UserId = userInfo.Id;
+                carBookingVM.OrderDetails.Name = userInfo.FirstName;
+                carBookingVM.OrderDetails.Name += $" {userInfo.LastName}";
+                carBookingVM.OrderDetails.Phone = userInfo.Phone;
+                carBookingVM.OrderDetails.Email = userInfo.Email;
+
+                // --> 241.2 На этом этапе переходим в CarOrderDetailsService и редактируем метод SaveCarOrderDetails
+            }
         }
         catch (Exception ex)
         {
@@ -226,25 +242,25 @@ else
         try
         {
             var paymentDTO = new StripePaymentDTO()
-                {
-                    Amount = Convert.ToInt32(carBookingVM.OrderDetails.TeslaCarDTO.TotalAmount * 100),
-                    // --> На этом этапе перейти в StripePaymentController и в методе Create, удалить умножение на 100
-                    ProductName = carBookingVM.OrderDetails.TeslaCarDTO.Name,
-                    ReturnUrl = $"/car/car-details/{CarId}"
-                };
+            {
+                Amount = Convert.ToInt32(carBookingVM.OrderDetails.TeslaCarDTO.TotalAmount * 100),
+                // --> На этом этапе перейти в StripePaymentController и в методе Create, удалить умножение на 100
+                ProductName = carBookingVM.OrderDetails.TeslaCarDTO.Name,
+                ReturnUrl = $"/car/car-details/{CarId}"
+            };
 
-                var result = await _stripeService.CheckOut(paymentDTO);
+            var result = await _stripeService.CheckOut(paymentDTO);
 
-                carBookingVM.OrderDetails.StripeSessionId = result.Data.ToString();
-                carBookingVM.OrderDetails.CarId = carBookingVM.OrderDetails.TeslaCarDTO.Id;
-                carBookingVM.OrderDetails.TotalCost = carBookingVM.OrderDetails.TeslaCarDTO.TotalAmount;
+            carBookingVM.OrderDetails.StripeSessionId = result.Data.ToString();
+            carBookingVM.OrderDetails.CarId = carBookingVM.OrderDetails.TeslaCarDTO.Id;
+            carBookingVM.OrderDetails.TotalCost = carBookingVM.OrderDetails.TeslaCarDTO.TotalAmount;
 
-                var carOrderDetailsSaved = await _carOrderDetailsService.SaveCarOrderDetails(carBookingVM.OrderDetails);
+            var carOrderDetailsSaved = await _carOrderDetailsService.SaveCarOrderDetails(carBookingVM.OrderDetails);
 
-                // На этом этапе вводим новую константу для сохранения деталей заказа в локальное хранилище браузера пользователей LOCAL_CAR_ORDER_DETAILS
-                await _localStorage.SetItemAsync(SD.LOCAL_CAR_ORDER_DETAILS, carOrderDetailsSaved);
+            // На этом этапе вводим новую константу для сохранения деталей заказа в локальное хранилище браузера пользователей LOCAL_CAR_ORDER_DETAILS
+            await _localStorage.SetItemAsync(SD.LOCAL_CAR_ORDER_DETAILS, carOrderDetailsSaved);
 
-                await _js.InvokeVoidAsync("redirectToCheckout", result.Data.ToString());
+            await _js.InvokeVoidAsync("redirectToCheckout", result.Data.ToString());
 
         }
         catch (Exception ex)

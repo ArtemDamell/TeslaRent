@@ -45,42 +45,57 @@
             <a class="text-reset me-3" href="cart">
                 <i class="fa-solid fa-cart-shopping"></i>
             </a>
-            <NavLink class="text-reset me-3" href="registration">
-                <i class="fa-solid fa-user-plus"></i>
-            </NavLink>
-            <NavLink class="text-reset me-3" href="login">
-                <i class="fa-solid fa-right-to-bracket"></i>
-            </NavLink>
 
-
+            @*236. В NavMenu меняем логику отображения на основе авторизации*@
+            <AuthorizeView>
+                <Authorized>
+                    <NavLink class="btn btn-outline-primary me-3" href="user-profile">
+                        Hello, @context.User.Identity.Name
+                    </NavLink>
+                    <NavLink class="btn btn-outline-danger me-3" href="logout">
+                        <i class="fa-solid fa-right-from-bracket"></i> Loguot
+                    </NavLink>
+                </Authorized>
+                <NotAuthorized>
+                    <NavLink class="text-reset me-3" href="registration">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </NavLink>
+                    <NavLink class="text-reset me-3" href="login">
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                    </NavLink>
+                </NotAuthorized>
+            </AuthorizeView>
             
+
+
+
             <!-- Avatar -->
-      @*      <div class="dropdown">
-                <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
-                   href="#"
-                   id="navbarDropdownMenuAvatar"
-                   role="button"
-                   data-mdb-toggle="dropdown"
-                   aria-expanded="false">
-                    <img src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp"
-                         class="rounded-circle"
-                         height="25"
-                         alt="Black and White Portrait of a Man"
-                         loading="lazy" />
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end"
-                    aria-labelledby="navbarDropdownMenuAvatar">
-                    <li>
-                        <a class="dropdown-item" href="#">My profile</a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="#">Settings</a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="#">Logout</a>
-                    </li>
-                </ul>
-            </div>*@
+            @*      <div class="dropdown">
+            <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
+               href="#"
+               id="navbarDropdownMenuAvatar"
+               role="button"
+               data-mdb-toggle="dropdown"
+               aria-expanded="false">
+                <img src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp"
+                     class="rounded-circle"
+                     height="25"
+                     alt="Black and White Portrait of a Man"
+                     loading="lazy" />
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="navbarDropdownMenuAvatar">
+                <li>
+                    <a class="dropdown-item" href="#">My profile</a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="#">Settings</a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="#">Logout</a>
+                </li>
+            </ul>
+        </div>*@
 
         </div>
         <!-- Right elements -->

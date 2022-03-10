@@ -5,6 +5,10 @@
 @inject ILocalStorageService _localStorage
 @inject ICarOrderDetailsService _carOrderService
 
+@*240.2/.2 Закрываем компонент CarDetails на атрибут авторизации*@
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = SD.CUSTOMER_ROLE)]
+
 @if (!isPaymentComplete)
 {
     <div class="text-center">

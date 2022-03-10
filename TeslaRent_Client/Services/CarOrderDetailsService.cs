@@ -44,7 +44,8 @@ namespace TeslaRent_Client.Services
         public async Task<CarOrderDetailsDTO> SaveCarOrderDetails(CarOrderDetailsDTO details)
         {
             // 210.2 Временно решаем проблему с UserId, присвоив его в ручном режиме
-            details.UserId = "dummy user";
+            // 241.2/.2 На этом этапе переходим в CarOrderDetailsService и редактируем метод SaveCarOrderDetails, комментируем строку ниже
+            //details.UserId = "dummy user";
 
             // 201. Идём в класс CarOrderDetailsService и реализовываем метод SaveCarOrderDetails
             var content = JsonConvert.SerializeObject(details);
