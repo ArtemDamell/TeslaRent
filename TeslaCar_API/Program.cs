@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 using Microsoft.OpenApi.Models;
 using Stripe;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,9 +33,13 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.S
 var appSettingsSection = builder.Configuration.GetSection("APISettings");
 builder.Services.Configure<APISettings>(appSettingsSection);
 
+// 249.1 В классе Program проекта API сконфигурировать новый класс MailJetSettings
+builder.Services.Configure<MailJetSettings>(builder.Configuration.GetSection("MailJetSettings"));
+
 // 140 Реализовываем аутентификацию для API. Переходим в класс Program.
 var apiSettings = appSettingsSection.Get<APISettings>();
 var key = Encoding.ASCII.GetBytes(apiSettings.SecretKey);
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -68,6 +73,8 @@ builder.Services.AddScoped<ITeslaCarAccessoryRepository, TeslaCarAccessoryReposi
 // 184. Добавить ICarOrderDetailsRepository в класс Program, проекта API
 builder.Services.AddScoped<ICarOrderDetailsRepository, CarOrderDetailsRepository>();
 
+// 252. В API проекте в классе Program сконфигурировать новый класс EmailSender
+builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 // 141.1 Следующим шагом будет настройка политики доступа к API в классе Program API
 builder.Services.AddCors(x => x.AddPolicy("TeslaRent", builder =>

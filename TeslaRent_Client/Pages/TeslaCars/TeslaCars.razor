@@ -1,10 +1,8 @@
 ﻿@page "/cars/allexs"
-
 @*169. Переходим в компонент TeslaCars проекта TeslaRent_Client и начинаем его реализовывать*@
 @inject ILocalStorageService _localStorage
 @inject IJSRuntime _js
 @inject ICarService _carService
-
 @*173. Заключаем весь UI в блок if*@
 
 @if (Cars is not null && Cars.Any())
@@ -65,40 +63,70 @@
             <div class="row p-2 mt-3 d-flex align-items-center" style="border-radius: 20px; border: 1px groove #000; background-color: #ffffffe6;">
                 <div class="col-12 col-lg-3 col-md-4">
                     <!-- Carousel wrapper -->
-            <div id="carouselBasicExample" class="carousel slide carousel-fade" data-mdb-ride="carousel">
+                    @*243.1 В компонент TeslaCars внести изменения кода вывода картинок*@
+                    <div id="carouselBasicExample_@item.Id" class="carousel slide carousel-fade" data-mdb-ride="carousel">
+
                         <!-- Indicators -->
-                <div class="carousel-indicators">
-                            <button type="button"
-                            data-mdb-target="#carouselBasicExample"
-                            data-mdb-slide-to="0"
-                            class="active"
-                            aria-current="true"
-                            aria-label="Slide 1"></button>
-                            @*<button type="button"
-                                data-mdb-target="#carouselBasicExample"
-                                data-mdb-slide-to="1"
-                                aria-label="Slide 2"></button>
-                                <button type="button"
-                                data-mdb-target="#carouselBasicExample"
-                                data-mdb-slide-to="2"
-                                aria-label="Slide 3"></button>*@
+                        <div class="carousel-indicators">
+
+                            @{
+                                int imageIndex = 0;
+                                int innerImageIndex = 0;
+                            }
+                            @foreach (var image in item.TeslaCarImages)
+                            {
+                                if (imageIndex == 0)
+                                {
+                                    <button type="button"
+                                            data-mdb-target="#carouselBasicExample_@item.Id"
+                                            data-mdb-slide-to="@imageIndex"
+                                            class="active"
+                                            aria-current="true"
+                                            aria-label="Slide 1">
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button"
+                                            data-mdb-target="#carouselBasicExample_@item.Id"
+                                            data-mdb-slide-to="@imageIndex"
+                                            aria-label="Slide 2">
+                                    </button>
+                                }
+                                imageIndex++;
+                            }
+
+
                         </div>
 
                         <!-- Inner -->
-                <div class="carousel-inner">
+                        <div class="carousel-inner">
                             <!-- Single item -->
-                    <div class="carousel-item active h-25">
-                                <img src="https://images.hdqwalls.com/wallpapers/tesla-model-3-2017-lf.jpg" class="d-block w-100" alt="Sunset Over the City" />
-                            </div>
-
+                            @*243.2 В компонент TeslaCars внести изменения кода вывода картинок*@
+                            @foreach (var image in item.TeslaCarImages)
+                            {
+                                if (innerImageIndex == 0)
+                                {
+                                    <div class="carousel-item active h-25">
+                                        <img src="@image.CarImageUrl" class="d-block w-100" style="border-radius: 20px;" alt="Sunset Over the City" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="carousel-item h-25">
+                                        <img src="@image.CarImageUrl" class="d-block w-100" style="border-radius: 20px;" alt="Sunset Over the City" />
+                                    </div>
+                                }
+                                innerImageIndex++;
+                            }
 
                             <!-- Inner -->
                             <!-- Controls -->
-                    <button class="carousel-control-prev" type="button" data-mdb-target="#carouselBasicExample" data-mdb-slide="prev">
+                            <button class="carousel-control-prev" type="button" data-mdb-target="#carouselBasicExample_@item.Id" data-mdb-slide="prev">
                                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                 <span class="visually-hidden">Previous</span>
                             </button>
-                            <button class="carousel-control-next" type="button" data-mdb-target="#carouselBasicExample" data-mdb-slide="next">
+                            <button class="carousel-control-next" type="button" data-mdb-target="#carouselBasicExample_@item.Id" data-mdb-slide="next">
                                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
                                 <span class="visually-hidden">Next</span>
                             </button>
@@ -106,7 +134,7 @@
                     </div>
                     <!-- Carousel wrapper -->
 
-        </div>
+                </div>
 
                 <div class="col-12 col-md-8 col-lg-9">
                     <div class="row pt-3">
@@ -200,4 +228,4 @@ else
         await LoadCars();
         isProcessing = false;
     }
-    }
+}

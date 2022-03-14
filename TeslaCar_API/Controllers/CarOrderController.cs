@@ -1,5 +1,6 @@
 ﻿using Business.Repository.IRepository;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.DTO;
@@ -13,9 +14,13 @@ namespace TeslaCar_API.Controllers
     {
         private readonly ICarOrderDetailsRepository _repository;
 
-        public CarOrderController(ICarOrderDetailsRepository repository)
+        // 253.1 Внести изменения в CarOrderController, добавив логику отправки почты в методе PaymetSeccessful
+        private readonly IEmailSender _emailSender;
+
+        public CarOrderController(ICarOrderDetailsRepository repository, IEmailSender emailSender)
         {
             _repository = repository;
+            _emailSender = emailSender;
         }
 
         [HttpPost]
@@ -56,6 +61,10 @@ namespace TeslaCar_API.Controllers
                         Title = "Mark as successful fail"
                     });
                 }
+
+                // 253.2 Внести изменения в CarOrderController, добавив логику отправки почты в методе PaymetSeccessful
+                await _emailSender.SendEmailAsync(details.Email, "Booking Confirmed! - Tesla Car Rent", 
+                    $"Your booking has been confirmed at Tesla Rent Service with ID: <b style=\"color: red\">{details.Id}</b>");
                 return Ok(result);
             }
             else

@@ -1,0 +1,9 @@
+﻿@*255.1 Добавить функционал переадресации на страницу авторизации, если пользователь пытается получить доступ к закрытому компоненту
+    Для этого в папке Authentication создать новый компонент RedirectToLogin*@
+
+@if (_notAuthorized)
+{
+    <div class="row alert alert-danger text-center">
+        <p>You do not have access to the requested page</p>
+    </div>
+}

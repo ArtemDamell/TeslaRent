@@ -7,7 +7,9 @@
                 <p>Please wait, we are authorizing the user</p>
             </Authorizing>
             <NotAuthorized>
-                <p>Not Authorized</p>
+                @*256. Добавить вызов нового компонента в файл App.razor*@
+                @*<p>Not Authorized</p>*@
+                <TeslaRent_Client.Pages.Authentication.RedirectToLogin />
             </NotAuthorized>
         </AuthorizeRouteView>
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
