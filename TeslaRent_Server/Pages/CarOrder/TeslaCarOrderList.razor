@@ -1,0 +1,59 @@
+﻿@*261(3). Добавить в папку Pages новую папку CarOrder, в неё компонент TeslaCarOrderList*@
+@page "/order-list"
+
+@using Business.Repository.IRepository
+@using Models.DTO
+@using Radzen
+
+@inject ICarOrderDetailsRepository _db
+@inject IJSRuntime _js
+@inject NavigationManager _navManager
+
+@if (!isLoading)
+{
+    <div class="row">
+        <div class="col">
+            <h1 class="text-info">Tesla Car Order's'</h1>
+        </div>
+    </div>
+
+    <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="10" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                    Data="@carOrders" TItem="CarOrderDetailsDTO" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
+        <Columns>
+            <RadzenDataGridColumn TItem="CarOrderDetailsDTO" Property="Name" Filterable="false" Title="Customer Name" Frozen="true" Width="70px" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="CarOrderDetailsDTO" Property="Phone" Filterable="false" Title="Customer Phone" Frozen="true" Width="70px" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="CarOrderDetailsDTO" Property="Email" Filterable="false" Title="Customer Email" Frozen="true" Width="70px" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="CarOrderDetailsDTO" Property="TeslaCarDTO.Name" Filterable="false" Title="Car" Frozen="true" Width="70px" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="CarOrderDetailsDTO" Property="Status" Filterable="false" Title="Status" Frozen="true" Width="70px" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="CarOrderDetailsDTO" Property="StartRentDate" Filterable="false" Title="Start Rent Date" Frozen="true" Width="70px" TextAlign="TextAlign.Center">
+                <Template Context="data">
+                    @string.Format("{0:d}", data.StartRentDate)
+                </Template>
+            </RadzenDataGridColumn>
+           
+            <RadzenDataGridColumn TItem="CarOrderDetailsDTO" Property="Id" Title="" Width="70px">
+                <Template Context="data">
+                    <NavLink class="btn btn-primary" href="@($"car-order/edit/{data.Id}")">Edit Order</NavLink>
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+}
+else
+{
+    <div class="text-center">
+        <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/2796ed81999693.5d10c0872415e.gif" />
+    </div>
+}
+
+@code {
+    IEnumerable<CarOrderDetailsDTO> carOrders = new List<CarOrderDetailsDTO>();
+    bool isLoading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        carOrders = await _db.GetAllCarOrderDetailsAsync();
+        isLoading = false;
+    }
+}

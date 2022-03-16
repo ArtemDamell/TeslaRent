@@ -1,0 +1,52 @@
+﻿@*257. Установить в проект Server пакет ProtectedBrowserStorage, создать компонент Counter и внедрить туда ProtectedBrowserStorage и ProtectedSessionStorage*@
+@page "/counter"
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedLocalStorage _localStorage
+@inject ProtectedSessionStorage _sessionStorage
+
+<h1>Counter</h1>
+
+<div class="row">
+    <hr />
+    <p>Counter <b>Local Storage:</b> @((counterLocal is not null) ? counterLocal.Value : 0 ) </p>
+    <p>Counter <b>Session Storage:</b> @((counterSession is not null) ? counterSession.Value : 0)</p>
+    <hr />
+</div>
+
+<p>Current counter: @currentCount</p>
+<button class="btn btn-primary" @onclick="IncrementCount">Increment</button>
+
+@code {
+    int currentCount = 0;
+
+    int? counterLocal;
+    int? counterSession;
+
+    async Task IncrementCount()
+    {
+        currentCount++;
+
+        await _localStorage.SetAsync("counterLocalStorage", currentCount);
+        await _sessionStorage.SetAsync("counterSessionStorage", currentCount);
+
+        var localResulr = await _localStorage.GetAsync<int?>("counterLocalStorage");
+        counterLocal = localResulr.Success ? localResulr.Value : 0;
+
+        var sessionResulr = await _sessionStorage.GetAsync<int?>("counterSessionStorage");
+        counterSession = sessionResulr.Success ? sessionResulr.Value : 0;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var localResulr = await _localStorage.GetAsync<int?>("counterLocalStorage");
+            counterLocal = localResulr.Success ? localResulr.Value : 0;
+
+            var sessionResulr = await _sessionStorage.GetAsync<int?>("counterSessionStorage");
+            counterSession = sessionResulr.Success ? sessionResulr.Value : 0;
+
+            StateHasChanged();
+        }
+    }
+}

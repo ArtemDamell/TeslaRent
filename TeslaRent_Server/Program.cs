@@ -54,6 +54,8 @@ builder.Services.AddHttpContextAccessor();
 // 115.1 Внедряим конфигурацию сервиса инициализации базы данных
 //builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 
+builder.Services.AddScoped<ICarOrderDetailsRepository, CarOrderDetailsRepository>();
+
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 

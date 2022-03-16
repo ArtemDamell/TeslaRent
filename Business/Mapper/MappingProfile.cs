@@ -39,7 +39,11 @@ namespace Business.Mapper
             CreateMap<CarAccessory, CarAccessoryDTO>().ReverseMap();
 
             // 183.1 После имплементации методов, добавляем карту для автомаппера в MappingProfile 
-            CreateMap<CarOrderDetails, CarOrderDetailsDTO>().ReverseMap();
+            //CreateMap<CarOrderDetails, CarOrderDetailsDTO>().ReverseMap();
+
+            // 262. На данном этапе у нас заполнена вся таблица, кроме машины, это происходит из-за того, что автомаппер не конвертирует автоматически данные.Исправить AutoMapperProfile
+            CreateMap<CarOrderDetails, CarOrderDetailsDTO>().ForMember(x => x.TeslaCarDTO, options => options.MapFrom(x => x.TeslaCar));
+            CreateMap<CarOrderDetailsDTO, CarOrderDetails>();
         }
     }
 }
