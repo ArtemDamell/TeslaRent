@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using Common;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -21,6 +22,7 @@ using Microsoft.Extensions.Logging;
 
 namespace TeslaRent_Server.Areas.Identity.Pages.Account
 {
+    [Authorize(Roles = SD.ADMIN_ROLE)]
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<IdentityUser> _signInManager;

@@ -114,7 +114,7 @@
 
     protected override void OnInitialized()
     {
-        if (OnCurrentRole.Name is not null)
+        if (OnCurrentRole?.Name is not null)
             selectedRoleId = OnCurrentRole.Id;
     }
 

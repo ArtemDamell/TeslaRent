@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DataAccess.Migrations
 {
-    public partial class initDb : Migration
+    public partial class PublishDB : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -28,6 +28,9 @@ namespace DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -219,6 +222,38 @@ namespace DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CarOrderDetails",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StripeSessionId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartRentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndRentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ActualStartRentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ActualEndRentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TotalCost = table.Column<double>(type: "float", nullable: false),
+                    TotalDays = table.Column<int>(type: "int", nullable: false),
+                    CarId = table.Column<int>(type: "int", nullable: false),
+                    IsPaymentSuccessful = table.Column<bool>(type: "bit", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CarOrderDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CarOrderDetails_TeslaCars_CarId",
+                        column: x => x.CarId,
+                        principalTable: "TeslaCars",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TeslaCarImages",
                 columns: table => new
                 {
@@ -283,6 +318,11 @@ namespace DataAccess.Migrations
                 column: "CarId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CarOrderDetails_CarId",
+                table: "CarOrderDetails",
+                column: "CarId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TeslaCarImages_CarId",
                 table: "TeslaCarImages",
                 column: "CarId");
@@ -307,6 +347,9 @@ namespace DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "CarAccessoryTeslaCar");
+
+            migrationBuilder.DropTable(
+                name: "CarOrderDetails");
 
             migrationBuilder.DropTable(
                 name: "TeslaCarImages");
