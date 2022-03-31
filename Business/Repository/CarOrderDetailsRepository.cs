@@ -127,9 +127,29 @@ namespace Business.Repository
             return new CarOrderDetailsDTO();
         }
 
-        public Task<bool> UpdateOrderStatusAsync(int carDetailsId, Status status)
+        // 264. В CarOrderDetailsRepository имплементировать недостающий метод UpdateOrderStatusAsync
+        public async Task<bool> UpdateOrderStatusAsync(int carDetailsId, Status status)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var carOrder = await _db.CarOrderDetails.FindAsync(carDetailsId);
+                if (carOrder is null)
+                    return false;
+
+                carOrder.Status = status;
+
+                if (status.Equals(Status.RentStarted))
+                    carOrder.ActualStartRentDate = DateTime.Now;
+                if (status.Equals(Status.RenEnded))
+                    carOrder.ActualEndRentDate = DateTime.Now;
+
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
     }
 }

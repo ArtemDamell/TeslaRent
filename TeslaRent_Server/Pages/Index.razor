@@ -1,9 +1,17 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Control Panel</PageTitle>
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+<div class="row">
+    <div class="col text-center text-info">
+        <h1>Welcome to admin dashboard!</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col text-center">
+        <p>Date: <b class="text-primary">@DateTime.Now.ToShortDateString()</b></p>
+        <p>Current Time: <b class="text-primary">@DateTime.Now.ToShortTimeString()</b></p>
+    </div>
+</div>
 
 

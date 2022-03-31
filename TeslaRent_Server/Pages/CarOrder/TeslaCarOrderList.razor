@@ -13,7 +13,7 @@
 {
     <div class="row">
         <div class="col">
-            <h1 class="text-info">Tesla Car Order's'</h1>
+            <h1 class="text-info">Tesla Car Order's</h1>
         </div>
     </div>
 
@@ -31,7 +31,7 @@
                 </Template>
             </RadzenDataGridColumn>
            
-            <RadzenDataGridColumn TItem="CarOrderDetailsDTO" Property="Id" Title="" Width="70px">
+            <RadzenDataGridColumn TItem="CarOrderDetailsDTO" Property="Id" Title="" Width="70px" Frozen="true" TextAlign="TextAlign.Center">
                 <Template Context="data">
                     <NavLink class="btn btn-primary" href="@($"car-order/edit/{data.Id}")">Edit Order</NavLink>
                 </Template>
