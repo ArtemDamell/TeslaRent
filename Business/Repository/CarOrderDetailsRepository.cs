@@ -4,11 +4,6 @@ using Common;
 using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Models.DTO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Business.Repository
 {
@@ -27,10 +22,10 @@ namespace Business.Repository
         }
 
         /// <summary>
-        /// Create new car order
+        /// Creates a new car order details object and saves it to the database.
         /// </summary>
-        /// <param name="carDetails">Car Order Details DTO model</param>
-        /// <returns>DTO model or NULL</returns>
+        /// <param name="carDetails">The car order details object to be created.</param>
+        /// <returns>The created car order details object.</returns>
         public async Task<CarOrderDetailsDTO> CreateAsync(CarOrderDetailsDTO carDetails)
         {
             try
@@ -49,11 +44,16 @@ namespace Business.Repository
             }
             catch (Exception ex)
             {
-
-                return null;
+                throw new Exception("Car order creation failed");
             }
         }
 
+        /// <summary>
+        /// Retrieves all car order details from the database.
+        /// </summary>
+        /// <returns>
+        /// An IEnumerable of CarOrderDetailsDTO objects.
+        /// </returns>
         public async Task<IEnumerable<CarOrderDetailsDTO>> GetAllCarOrderDetailsAsync()
         {
             try
@@ -65,11 +65,17 @@ namespace Business.Repository
             }
             catch (Exception ex)
             {
-
-                return null;
+                throw new Exception("Getting car order failed");
             }
         }
 
+        /// <summary>
+        /// Retrieves the car order details for the given car order id.
+        /// </summary>
+        /// <param name="carOrderId">The car order id.</param>
+        /// <returns>
+        /// The car order details for the given car order id.
+        /// </returns>
         public async Task<CarOrderDetailsDTO> GetCarOrderDetailsAsync(int carOrderId)
         {
             try
@@ -86,29 +92,17 @@ namespace Business.Repository
             catch (Exception ex)
             {
 
-                return null;
+                throw new Exception("Getting car order details by ID failed");
             }
         }
 
         // 217.1 Перенести метод IsCarBookedAsync из CarOrderDetailsRepository в TeslaCarRepository
-        //public async Task<bool> IsCarBookedAsync(int carId, DateTime startRentDate, DateTime endRentDate)
-        //{
-        //    var bookingStatus = false;
-        //    var existingBooking = await _db.CarOrderDetails.Where(x => 
-        //                                                                             x.CarId == carId &&
-        //                                                                             x.IsPaymentSuccessful &&
-        //                                                                             startRentDate < x.EndRentDate &&
-        //                                                                             endRentDate.Date > x.StartRentDate ||
-        //                                                                             endRentDate.Date > x.StartRentDate.Date &&
-        //                                                                             startRentDate.Date < x.StartRentDate.Date).FirstOrDefaultAsync();
-
-        //    if (existingBooking is not null)
-        //        bookingStatus = true;
-
-        //    return bookingStatus;
-        //}
-
         // Эти 2 метода реализуем позже, не на шаге 183!
+        /// <summary>
+        /// Marks the payment of a car order as successful.
+        /// </summary>
+        /// <param name="id">The id of the car order.</param>
+        /// <returns>The updated car order details.</returns>
         public async Task<CarOrderDetailsDTO> MarkPaymentSuccessfulAsync(int id)
         {
             // 215. Реализовать метод MarkPaymentSuccessfulAsync в CarOrderDetailsRepository
@@ -128,6 +122,14 @@ namespace Business.Repository
         }
 
         // 264. В CarOrderDetailsRepository имплементировать недостающий метод UpdateOrderStatusAsync
+        /// <summary>
+        /// Updates the status of a car order.
+        /// </summary>
+        /// <param name="carDetailsId">The car details identifier.</param>
+        /// <param name="status">The status.</param>
+        /// <returns>
+        ///   <c>true</c> if the status was successfully updated; otherwise, <c>false</c>.
+        /// </returns>
         public async Task<bool> UpdateOrderStatusAsync(int carDetailsId, Status status)
         {
             try
@@ -138,15 +140,15 @@ namespace Business.Repository
 
                 carOrder.Status = status;
 
-                if (status.Equals(Status.RentStarted))
+                if (status == Status.RentStarted)
                     carOrder.ActualStartRentDate = DateTime.Now;
-                if (status.Equals(Status.RenEnded))
+                else if (status == Status.RenEnded)
                     carOrder.ActualEndRentDate = DateTime.Now;
 
                 await _db.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

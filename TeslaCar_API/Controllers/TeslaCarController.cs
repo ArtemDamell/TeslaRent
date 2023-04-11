@@ -1,9 +1,6 @@
 ﻿using Business.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using Models;
-using Microsoft.AspNetCore.Authorization;
-using Common;
 using System.Globalization;
 
 namespace TeslaCar_API.Controllers
@@ -25,6 +22,12 @@ namespace TeslaCar_API.Controllers
         //[Authorize]
         // 166.1 Перейти в контроллер TeslaCarController и изменить методы получения машин(GetAllCars, GetCar)
         [HttpGet]
+        /// <summary>
+        /// Gets all cars with specified start and end rent dates.
+        /// </summary>
+        /// <param name="startRentDate">Start rent date in MM.dd.yyyy format.</param>
+        /// <param name="endRentDate">End rent date in MM.dd.yyyy format.</param>
+        /// <returns>List of cars.</returns>
         public async Task<IActionResult> GetAllCars(string? startRentDate = null, string? endRentDate = null)
         {
             // 166.3 Изменяем метод под новые параметры *******************************************
@@ -67,6 +70,13 @@ namespace TeslaCar_API.Controllers
         //[Authorize(Roles = SD.ADMIN_ROLE)]
         // 166.2 Перейти в контроллер TeslaCarController и изменить методы получения машин(GetAllCars, GetCar)
         [HttpGet("{carId}")]
+        /// <summary>
+        /// Gets a single Tesla car with the specified carId, startRentDate and endRentDate.
+        /// </summary>
+        /// <param name="carId">The carId of the Tesla car.</param>
+        /// <param name="startRentDate">The start rent date of the Tesla car.</param>
+        /// <param name="endRentDate">The end rent date of the Tesla car.</param>
+        /// <returns>The Tesla car with the specified carId, startRentDate and endRentDate.</returns>
         public async Task<IActionResult> GetSingleTeslaCar(int? carId, string? startRentDate = null, string? endRentDate = null)
         {
             if (carId is null)
@@ -116,7 +126,7 @@ namespace TeslaCar_API.Controllers
             {
                 return BadRequest(new ErrorModel()
                 {
-                    Title="Car not found",
+                    Title = "Car not found",
                     ErrorMessage = $"Car by id {carId} NOT FOUND!",
                     StatusCode = StatusCodes.Status404NotFound
                 });

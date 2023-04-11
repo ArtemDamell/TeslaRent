@@ -19,6 +19,12 @@ namespace TeslaCar_API.Controllers
         }
 
         [HttpPost]
+        /// <summary>
+        /// Creates a Stripe payment session and returns the session ID.
+        /// </summary>
+        /// <returns>
+        /// Returns the session ID of the created Stripe payment session.
+        /// </returns>
         public async Task<IActionResult> Create(StripePaymentDTO payment)
         {
             try

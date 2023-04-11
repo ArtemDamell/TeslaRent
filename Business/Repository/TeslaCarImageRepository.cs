@@ -19,6 +19,11 @@ namespace Business.Repository
             _db = db;
         }
 
+        /// <summary>
+        /// Creates a TeslaCarImage from the given TeslaCarImageDTO.
+        /// </summary>
+        /// <param name="imageDTO">The TeslaCarImageDTO to create the TeslaCarImage from.</param>
+        /// <returns>True if the TeslaCarImage was created successfully, false otherwise.</returns>
         public async Task<bool> CreateTeslaCarImage(TeslaCarImageDTO imageDTO)
         {
             try
@@ -34,6 +39,11 @@ namespace Business.Repository
             }
         }
 
+        /// <summary>
+        /// Deletes all Tesla car images associated with a given car ID.
+        /// </summary>
+        /// <param name="carId">The ID of the car to delete images for.</param>
+        /// <returns>True if the images were successfully deleted, false otherwise.</returns>
         public async Task<bool> DeleteTeslaCarImageByCarId(int carId)
         {
             try
@@ -49,6 +59,11 @@ namespace Business.Repository
             }
         }
 
+        /// <summary>
+        /// Deletes a Tesla car image from the database by its image ID.
+        /// </summary>
+        /// <param name="imageId">The ID of the image to delete.</param>
+        /// <returns>True if the image was successfully deleted, false otherwise.</returns>
         public async Task<bool> DeleteTeslaCarImageByImageId(int imageId)
         {
             try
@@ -65,6 +80,11 @@ namespace Business.Repository
         }
 
         // 70.2
+        /// <summary>
+        /// Deletes a Tesla car image from the database by its image URL.
+        /// </summary>
+        /// <param name="imageUrl">The URL of the image to be deleted.</param>
+        /// <returns>A boolean value indicating whether the deletion was successful.</returns>
         public async Task<bool> DeleteTeslaCarImageByImageUrl(string imageUrl)
         {
             try
@@ -82,6 +102,11 @@ namespace Business.Repository
 
         }
 
+        /// <summary>
+        /// Retrieves a list of Tesla car images for a given car ID.
+        /// </summary>
+        /// <param name="carId">The ID of the car.</param>
+        /// <returns>A list of Tesla car images.</returns>
         public async Task<IEnumerable<TeslaCarImageDTO>?> GetTeslaCarImages(int carId)
         {
             try

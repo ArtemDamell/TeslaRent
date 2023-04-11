@@ -14,6 +14,12 @@ namespace TeslaRent_Client.Services
             _client = client;
         }
 
+        /// <summary>
+        /// Gets all existing Tesla cars from the API based on the start and end rent dates.
+        /// </summary>
+        /// <param name="startRentDate">The start date of the rental period.</param>
+        /// <param name="endRentDate">The end date of the rental period.</param>
+        /// <returns>A collection of TeslaCarDTO objects.</returns>
         public async Task<IEnumerable<TeslaCarDTO>> GetAllExistingCars(string startRentDate, string endRentDate)
         {
             var response = await _client.GetAsync($"api/teslacar?startRentDate={startRentDate}&endRentDate={endRentDate}");
@@ -23,6 +29,13 @@ namespace TeslaRent_Client.Services
         }
 
         // 190. Перейти в CarService и имплементировать метод GetCarDetails
+        /// <summary>
+        /// Gets the details of a Tesla car based on the carId, startRentDate and endRentDate.
+        /// </summary>
+        /// <param name="carId">The carId of the Tesla car.</param>
+        /// <param name="startRentDate">The start date of the rental.</param>
+        /// <param name="endRentDate">The end date of the rental.</param>
+        /// <returns>A TeslaCarDTO object containing the details of the car.</returns>
         public async Task<TeslaCarDTO> GetCarDetails(int carId, string startRentDate, string endRentDate)
         {
             var response = await _client.GetAsync($"api/teslacar/{carId}?startRentDate={startRentDate}&endRentDate={endRentDate}");

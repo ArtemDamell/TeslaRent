@@ -193,13 +193,10 @@ else
         try
         {
             if (await _localStorage.GetItemAsync<IndexVM>(SD.LOCAL_INITIALBOOKING) is not null)
-            {
                 indexModel = await _localStorage.GetItemAsync<IndexVM>(SD.LOCAL_INITIALBOOKING);
-            }
             else
-            {
                 indexModel.RentDays = 1;
-            }
+
             await LoadCars();
         }
         catch (Exception ex)

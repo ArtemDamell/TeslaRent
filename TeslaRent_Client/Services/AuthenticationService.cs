@@ -24,6 +24,11 @@ namespace TeslaRent_Client.Services
             _localStorage = localStorage;
             _authStatePrivider = authStatePrivider;
         }
+        /// <summary>
+        /// Logs in a user with the given authentication information and stores the authentication token and user details in the local storage.
+        /// </summary>
+        /// <param name="userAuthInfo">The authentication information of the user.</param>
+        /// <returns>An authentication response containing the authentication status.</returns>
         public async Task<AuthenticationResponseDTO> Login(AuthenticationRequestDTO userAuthInfo)
         {
             // 229.3 Создаём HTTP Request
@@ -49,6 +54,12 @@ namespace TeslaRent_Client.Services
         }
 
         // 230.1 Реализовываем LogOut метод в AuthenticationService
+        /// <summary>
+        /// Logs out the current user by removing the authentication token from local storage and notifying the authentication state provider.
+        /// </summary>
+        /// <returns>
+        /// An asynchronous task that represents the operation.
+        /// </returns>
         public async Task Logout()
         {
             await _localStorage.RemoveItemAsync(SD.LOCAL_TOKEN);
@@ -61,6 +72,11 @@ namespace TeslaRent_Client.Services
         }
 
         // // 230.2 Реализовываем RegisterUser метод в AuthenticationService
+        /// <summary>
+        /// Registers a user with the given user registration information.
+        /// </summary>
+        /// <param name="userRegInfo">The user registration information.</param>
+        /// <returns>A <see cref="RegistrationResponseDTO"/> object indicating the success of the registration.</returns>
         public async Task<RegistrationResponseDTO> RegisterUser(UserRequestDTO userRegInfo)
         {
             var content = JsonConvert.SerializeObject(userRegInfo);

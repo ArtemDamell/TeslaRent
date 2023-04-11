@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models.ViewModels
+﻿namespace Models.ViewModels
 {
     // 156. Создать в ней класс IndexVM
     public class IndexVM

@@ -6,6 +6,11 @@ namespace TeslaRent_Client.Helpers
     // 221. В проект Client в папку Helpers добавить класс JwtParser
     public static class JwtParser
     {
+        /// <summary>
+        /// Parses the claims from a JWT string.
+        /// </summary>
+        /// <param name="jwt">The JWT string.</param>
+        /// <returns>A collection of claims.</returns>
         public static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
         {
             var claims = new List<Claim>();
@@ -18,6 +23,11 @@ namespace TeslaRent_Client.Helpers
             return claims;
         }
 
+        /// <summary>
+        /// Parses a Base64 string without padding into a byte array.
+        /// </summary>
+        /// <param name="base64">The Base64 string to parse.</param>
+        /// <returns>A byte array containing the parsed Base64 string.</returns>
         static byte[] ParseBase64WithoutPadding(string base64)
         {
             switch (base64.Length % 4)

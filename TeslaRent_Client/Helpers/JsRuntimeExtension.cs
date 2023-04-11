@@ -6,14 +6,26 @@ namespace TeslaRent_Client.Helpers
     // 40. Создаём метод расширения для вызова toastr
     public static class JsRuntimeExtension
     {
-        public static async ValueTask ToastrSuccess(this IJSRuntime js, string message)
+        /// <summary>
+        /// Invokes the ShowToastr JavaScript function with the success type and the given message.
+        /// </summary>
+        /// <param name="js">The IJSRuntime instance.</param>
+        /// <param name="message">The message to be displayed.</param>
+        /// <returns>A ValueTask representing the asynchronous operation.</returns>
+        public static ValueTask ToastrSuccess(this IJSRuntime js, string message)
         {
-            await js.InvokeVoidAsync("ShowToastr", "success", message);
+            return js.InvokeVoidAsync("ShowToastr", "success", message);
         }
 
-        public static async ValueTask ToastrError(this IJSRuntime js, string message)
+        /// <summary>
+        /// Invokes the ShowToastr JavaScript function with the error type and message.
+        /// </summary>
+        /// <param name="js">The IJSRuntime instance.</param>
+        /// <param name="message">The message to display.</param>
+        /// <returns>A ValueTask representing the asynchronous operation.</returns>
+        public static ValueTask ToastrError(this IJSRuntime js, string message)
         {
-            await js.InvokeVoidAsync("ShowToastr", "error", message);
+            return js.InvokeVoidAsync("ShowToastr", "error", message);
         }
     }
 }

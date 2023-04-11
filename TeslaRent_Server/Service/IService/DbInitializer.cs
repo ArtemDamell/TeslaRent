@@ -2,6 +2,7 @@
 using DataAccess.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using TeslaRent_Server.Helpers.CustomeExceptions;
 
 namespace TeslaRent_Server.Service.IService
 {
@@ -29,12 +30,12 @@ namespace TeslaRent_Server.Service.IService
             try
             {
                 // Проверяем, если есть хотя бы один файл миграций, применяем наш класс
-                if (_db.Database.GetPendingMigrations().Count() > 0)
+                if (_db.Database.GetPendingMigrations().Any())
                     _db.Database.Migrate();
             }
             catch (Exception)
             {
-                
+                throw new DatabaseMigrationException("Error applying database migrations.");
             }
 
             // Проверяем роль и если её нет - создаём все роли и админа

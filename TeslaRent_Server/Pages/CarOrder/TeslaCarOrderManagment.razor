@@ -15,7 +15,7 @@
     }
     else
     {
-     <div class="row p-2 my-3" style="border-radius: 20px;">
+        <div class="row p-2 my-3" style="border-radius: 20px;">
             <div class="col-sm-12 col-md-7 p-4">
                 <div class="row pb-3 px-2 text-success border-bottom border-dark">
                     <div class="col-8 py-1">
@@ -203,10 +203,10 @@
 </div>
 
 @code {
-        [Parameter] public int? Id { get; set; }
+    [Parameter] public int? Id { get; set; }
 
-        bool isLoading = false;
-        CarOrderDetailsDTO carBooking = new() { TeslaCarDTO = new TeslaCarDTO() };
+    bool isLoading = false;
+    CarOrderDetailsDTO carBooking = new() { TeslaCarDTO = new TeslaCarDTO() };
 
     protected override async Task OnInitializedAsync()
     {

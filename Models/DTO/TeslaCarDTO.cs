@@ -35,5 +35,6 @@ namespace Models
         // 219.1 Добавить в модель TeslaCarDTO новое свойство, bool IsBooked
         // Далее в TeslaCarRepository в методе GetCar
         public bool IsBooked { get; set; }
+        public string CreatedBy { get; set; }
     }
 }

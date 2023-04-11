@@ -55,6 +55,7 @@ builder.Services.AddHttpContextAccessor();
 //builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 
 builder.Services.AddScoped<ICarOrderDetailsRepository, CarOrderDetailsRepository>();
+builder.Services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor().AddCircuitOptions(option => option.DetailedErrors = true);

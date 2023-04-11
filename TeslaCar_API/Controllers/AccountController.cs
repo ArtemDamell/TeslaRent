@@ -28,8 +28,8 @@ namespace TeslaCar_API.Controllers
         private readonly APISettings _apiSettings;
 
         public AccountController(
-            SignInManager<ApplicationUser> signInManager, 
-            UserManager<ApplicationUser> userManager, 
+            SignInManager<ApplicationUser> signInManager,
+            UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager,
 
             // 137. Внедряем зависимость нового класса в AccountController
@@ -45,6 +45,13 @@ namespace TeslaCar_API.Controllers
         //130. Добавить конечную точку для регистрации пользователей
         [HttpPost]
         [AllowAnonymous]
+        /// <summary>
+        /// Creates a new user account with the specified details and adds the user to the Customer role.
+        /// </summary>
+        /// <param name="userRequestDTO">The details of the user to be created.</param>
+        /// <returns>
+        /// 201 if the user was successfully created, 400 if the user details are invalid or if there was an error creating the user.
+        /// </returns>
         public async Task<IActionResult> SingUp([FromBody] UserRequestDTO userRequestDTO)
         {
             if (userRequestDTO is null || !ModelState.IsValid)
@@ -90,6 +97,11 @@ namespace TeslaCar_API.Controllers
         // 133. Создаём конечные точки авторизации пользователей
         [HttpPost]
         [AllowAnonymous]
+        /// <summary>
+        /// Signs in a user with the given authentication request and returns an authentication response.
+        /// </summary>
+        /// <param name="authenticationRequest">The authentication request.</param>
+        /// <returns>An authentication response.</returns>
         public async Task<IActionResult> SingIn([FromBody] AuthenticationRequestDTO authenticationRequest)
         {
             var result = await _signInManager.PasswordSignInAsync(authenticationRequest.UserName, authenticationRequest.Password, false, false);
@@ -99,10 +111,10 @@ namespace TeslaCar_API.Controllers
                 if (user is null)
                 {
                     return Unauthorized(new AuthenticationResponseDTO
-                        {
-                            IsAuthSuccessful = false,
-                            ErrorMessage = "Invalid authentication"
-                        });
+                    {
+                        IsAuthSuccessful = false,
+                        ErrorMessage = "Invalid authentication"
+                    });
                 }
 
                 // Если всё прошло успешно, нам необходимо авторизовать пользователя
@@ -146,6 +158,10 @@ namespace TeslaCar_API.Controllers
         }
 
         // 138. GetSigningCredentials - Получить учетные данные для подписи
+        /// <summary>
+        /// Gets the signing credentials for the API.
+        /// </summary>
+        /// <returns>The signing credentials.</returns>
         SigningCredentials GetSigningCredentials()
         {
             var secret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_apiSettings.SecretKey));
@@ -153,6 +169,11 @@ namespace TeslaCar_API.Controllers
         }
 
         // Объекты типа Claim ассациируются с пользователем в момент авторизации и сопровождают его до конца сессии
+        /// <summary>
+        /// Gets the claims associated with the specified user.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        /// <returns>A list of claims associated with the user.</returns>
         async Task<List<Claim>> GetClaims(ApplicationUser user)
         {
             var claims = new List<Claim>

@@ -11,31 +11,6 @@ namespace TeslaCar_API.Helpers
     {
         // 251.1 Перейти на https://github.com/mailjet/mailjet-apiv3-dotnet раздел Make your first call скопировать метод static async Task RunAsync() в новый класс
         // 251.2 Установить в API проект пакет mailjet
-        //static async Task RunAsync()
-        //{
-        //    MailjetClient client = new MailjetClient(
-        //       Environment.GetEnvironmentVariable("MJ_APIKEY_PUBLIC"),
-        //       Environment.GetEnvironmentVariable("MJ_APIKEY_PRIVATE"));
-
-        //    MailjetRequest request = new MailjetRequest
-        //    {
-        //        Resource = Send.Resource,
-        //    };
-
-        // // construct your email with builder
-        //    var email = new TransactionalEmailBuilder()
-        //        .WithFrom(new SendContact("from@test.com"))
-        //        .WithSubject("Test subject")
-        //        .WithHtmlPart("<h1>Header</h1>")
-        //        .WithTo(new SendContact("to@test.com"))
-        //        .Build();
-
-        //    // invoke API to send email
-        //    var response = await client.SendTransactionalEmailAsync(email);
-
-        //    // check response
-        //    //Assert.AreEqual(1, response.Messages.Length);
-        //}
 
         private readonly MailJetSettings _mailJetSettings;
         public EmailSender(IOptions<MailJetSettings> mailJetSettings)
@@ -43,6 +18,13 @@ namespace TeslaCar_API.Helpers
             _mailJetSettings = mailJetSettings.Value;
         }
 
+        /// <summary>
+        /// Sends an email using MailJet API
+        /// </summary>
+        /// <param name="email">The email address of the recipient</param>
+        /// <param name="subject">The subject of the email</param>
+        /// <param name="htmlMessage">The HTML message of the email</param>
+        /// <returns>A response from the MailJet API</returns>
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
             MailjetClient client = new MailjetClient(

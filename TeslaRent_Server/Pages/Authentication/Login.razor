@@ -1,0 +1,61 @@
+﻿@page "/login"
+
+@using System.ComponentModel.DataAnnotations
+
+@inject IAuthenticationRepository _authRepository
+@inject NavigationManager _navManager
+
+<div class="row">
+    <div class="col text-info"><h1>Login</h1></div>
+</div>
+<div class="row">
+    <div class="col">
+        <EditForm Model="login" OnValidSubmit="LoginHandler">
+            <DataAnnotationsValidator />
+
+            <div class="form-group">
+                <div class="form-label">Email</div>
+                <InputText @bind-Value="login.Email" />
+                <ValidationMessage For="(() => login.Email)" class="text-danger" />
+            </div>
+            <div class="form-group">
+                <div class="form-label">Password</div>
+                <InputText @bind-Value="login.Password" />
+                <ValidationMessage For="(() => login.Password)" class="text-danger form-control" />
+            </div>
+            <div class="form-group">
+                <InputCheckbox @bind-Value="login.RememberMe" class="form-check">Remember Me</InputCheckbox>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-outline-success">Login</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    LoginModel login = new();
+
+    async Task LoginHandler()
+    {
+        // TODO: Authentication repository and logic
+        var result = await _authRepository.Login(login.Email, login.Password, login.RememberMe);
+
+        if (result)
+            _navManager.NavigateTo("/", true);
+    }
+
+    class LoginModel
+    {
+        [Required]
+        [DataType(DataType.EmailAddress)]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required]
+        [MinLength(6), MaxLength(50)]
+        public string Password { get; set; }
+
+        public bool RememberMe { get; set; }
+    }
+}

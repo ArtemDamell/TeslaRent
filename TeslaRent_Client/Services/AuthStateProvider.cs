@@ -9,7 +9,7 @@ namespace TeslaRent_Client.Services
 {
     // 222. В клиентскую часть в папку Services добавить новый сервис AuthStateProvider
     // Этот класс нам понадобится, чтобы глобально вставлять Bearer Token в каждый запрос
-    public class AuthStateProvider :  AuthenticationStateProvider
+    public class AuthStateProvider : AuthenticationStateProvider
     {
         private readonly HttpClient _httpClient;
         private readonly ILocalStorageService _localStorage;
@@ -20,6 +20,12 @@ namespace TeslaRent_Client.Services
             _localStorage = localStorage;
         }
 
+        /// <summary>
+        /// Gets the authentication state of the current user.
+        /// </summary>
+        /// <returns>
+        /// The authentication state of the current user.
+        /// </returns>
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             // На этом месте добавить константу Local_Token
@@ -39,6 +45,10 @@ namespace TeslaRent_Client.Services
         }
 
         // 238. На данном этапе выход работает, но UI без обновления не меняется, исправим это, добавляем метод в AuthStateProvider
+        /// <summary>
+        /// Notifies the authentication state changed.
+        /// </summary>
+        /// <param name="authState">The authentication state.</param>
         public void NotifyUserLoggedIn(string token)
         {
             var authenticatedUser = new ClaimsPrincipal(new ClaimsIdentity(JwtParser.ParseClaimsFromJwt(token), "jwtAuthType"));
@@ -46,11 +56,14 @@ namespace TeslaRent_Client.Services
 
             NotifyAuthenticationStateChanged(authState);
         }
+
+        /// <summary>
+        /// Notifies the authentication state changed.
+        /// </summary>
         public void NotifyUserLogout()
         {
             var authState = Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
             NotifyAuthenticationStateChanged(authState);
         }
-
     }
 }
