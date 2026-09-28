@@ -82,3 +82,9 @@ TeslaRent
 │
 └── Common
     └── Shared application components
+```
+
+## About the Project
+
+This project represents an earlier stage of my professional .NET development experience and was built before my later commercial work with invoicing, billing, licensing and third-party integrations.
+It remains publicly available as part of my development portfolio and as an example of a multi-layered .NET application built with Blazor, ASP.NET Core and Entity Framework Core.
